@@ -16,6 +16,7 @@
     "main_module": "awssecurityhub_connector.py",
     "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
+    "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud API, July 28, 2021"
     ],
