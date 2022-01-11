@@ -1,6 +1,6 @@
 # File: awssecurityhub_connector.py
 #
-# Copyright (c) 2016-2021 Splunk Inc.
+# Copyright (c) 2019-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,20 +14,19 @@
 # and limitations under the License.
 #
 #
-# Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-
-# Usage of the consts file is recommended
-import requests
-import json
-import ipaddress
-from datetime import datetime, timedelta
-from boto3 import client, Session
-from botocore.config import Config
-from awssecurityhub_consts import *
 import ast
+import ipaddress
+import json
+from datetime import datetime, timedelta
+
+import phantom.app as phantom
+import requests
+from boto3 import Session, client
+from botocore.config import Config
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+
+from awssecurityhub_consts import *
 
 
 class RetVal(tuple):
@@ -325,7 +324,8 @@ class AwsSecurityHubConnector(BaseConnector):
         findings = []
         while len(findings) < max_containers:
 
-            ret_val, resp_json = self._make_boto_call(action_result, 'receive_message', QueueUrl=url, MaxNumberOfMessages=AWSSECURITYHUB_SQS_MESSAGE_LIMIT)
+            ret_val, resp_json = self._make_boto_call(action_result, 'receive_message', QueueUrl=url,
+                MaxNumberOfMessages=AWSSECURITYHUB_SQS_MESSAGE_LIMIT)
 
             if phantom.is_fail(ret_val):
                 return None
@@ -337,7 +337,8 @@ class AwsSecurityHubConnector(BaseConnector):
                 try:
                     message_dict = json.loads(message.get('Body', '{}'))
                 except:
-                    self.debug_print("Skipping the following sqs message because of failure to extract finding object: {}".format(message.get('Body', '{}')))
+                    self.debug_print("Skipping the following sqs message because of failure to extract finding object: {}".format(
+                        message.get('Body', '{}')))
                     continue
 
                 if message_dict and message_dict.get('detail', {}).get('findings', []):
@@ -502,7 +503,8 @@ class AwsSecurityHubConnector(BaseConnector):
                         ipaddress.ip_address(str(ip_add))
                         ip_add_list.append({"Cidr": ip_add})
                     except:
-                        self.debug_print('Resource ec2 IP validation failed for {}. Hence, skipping this IP address from being added to the filter.'.format(ip_add))
+                        self.debug_print('Resource ec2 IP validation failed for {}. '
+                            'Hence, skipping this IP address from being added to the filter.'.format(ip_add))
 
             if not ip_add_list:
                 return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_ALL_RESOURCE_IP_VALIDATION)
@@ -520,7 +522,8 @@ class AwsSecurityHubConnector(BaseConnector):
                         ipaddress.ip_address(str(ip_add))
                         ip_add_list.append({"Cidr": ip_add})
                     except:
-                        self.debug_print('Resource ec2 IP validation failed for {}. Hence, skipping this IP address from being added to the filter.'.format(ip_add))
+                        self.debug_print('Resource ec2 IP validation failed for {}. '
+                            'Hence, skipping this IP address from being added to the filter.'.format(ip_add))
 
             if not ip_add_list:
                 return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_ALL_NETWORK_IP_VALIDATION)
@@ -573,9 +576,11 @@ class AwsSecurityHubConnector(BaseConnector):
 
         while True:
             if next_token:
-                ret_val, response = self._make_boto_call(action_result, method_name, Filters=filters, NextToken=next_token, MaxResults=AWSSECURITYHUB_MAX_PER_PAGE_LIMIT)
+                ret_val, response = self._make_boto_call(action_result, method_name, Filters=filters,
+                    NextToken=next_token, MaxResults=AWSSECURITYHUB_MAX_PER_PAGE_LIMIT)
             else:
-                ret_val, response = self._make_boto_call(action_result, method_name, Filters=filters, MaxResults=AWSSECURITYHUB_MAX_PER_PAGE_LIMIT)
+                ret_val, response = self._make_boto_call(action_result, method_name, Filters=filters,
+                    MaxResults=AWSSECURITYHUB_MAX_PER_PAGE_LIMIT)
 
             if phantom.is_fail(ret_val):
                 return None
@@ -653,7 +658,8 @@ class AwsSecurityHubConnector(BaseConnector):
         for finding in list_findings:
             if finding.get('Id') == findings_id:
                 if record_state and finding.get('RecordState') == record_state:
-                    action_result.set_status(phantom.APP_SUCCESS, AWSSECURITYHUB_ERR_FINDING_ID_IN_RECORD_STATE.format(record_state=record_state))
+                    action_result.set_status(phantom.APP_SUCCESS, AWSSECURITYHUB_ERR_FINDING_ID_IN_RECORD_STATE.format(
+                        record_state=record_state))
                     return (True, False, finding)
                 valid_finding = finding
                 break
@@ -836,8 +842,9 @@ class AwsSecurityHubConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import pudb
     import argparse
+
+    import pudb
 
     pudb.set_trace()
 
