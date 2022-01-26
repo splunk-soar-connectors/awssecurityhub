@@ -2,7 +2,7 @@
 # AWS Security Hub
 
 Publisher: Splunk  
-Connector Version: 2\.3\.2  
+Connector Version: 2\.3\.4  
 Product Vendor: AWS  
 Product Name: Security Hub  
 Product Version Supported (regex): "\.\*"  
@@ -10,8 +10,8 @@ Minimum Product Version: 4\.10\.0\.40961
 
 This app integrates with AWS Security Hub to ingest findings
 
-[comment]: # " File: readme.md"
-[comment]: # "  Copyright (c) 2016-2021 Splunk Inc."
+[comment]: # " File: README.md"
+[comment]: # "  Copyright (c) 2019-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
