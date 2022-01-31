@@ -33,7 +33,7 @@ AWSSECURITYHUB_REGION_DICT = {
         "EU (London)": "eu-west-2",
         "EU (Paris)": "eu-west-3",
         "South America (Sao Paulo)": "sa-east-1"
-    }
+}
 
 AWSSECURITYHUB_FINDING_CEF_TYPES = {
         "Id": ["aws security hub findings id", "aws arn"],
@@ -43,13 +43,13 @@ AWSSECURITYHUB_FINDING_CEF_TYPES = {
         "ProductFields.action/networkConnectionAction/localPortDetails/port": ["port"],
         "ProductFields.action/networkConnectionAction/remotePortDetails/port": ["port"],
         "ProductFields.action/networkConnectionAction/remoteIpDetails/ipAddressV4": ["ip"]
-    }
+}
 
 AWSSECURITYHUB_RESOURCE_CEF_TYPES = {
         "Id": ["aws arn"],
         "InstanceId": ["aws ec2 instance id"],
         "Details.AwsEc2Instance.IpV4Addresses": ["ip"]
-    }
+}
 
 AWSSECURITYHUB_ERR_TEST_CONNECTIVITY = "Test Connectivity Failed"
 AWSSECURITYHUB_SUCC_TEST_CONNECTIVITY = "Test Connectivity Passed"
@@ -76,3 +76,5 @@ AWSSECURITYHUB_NON_NEG_INT_MSG = "Please provide a valid non-negative integer va
 AWSSECURITYHUB_LIMIT_KEY = "'limit' action parameter"
 AWSSECURITYHUB_POLL_NOW_DAYS_KEY = "'poll_now_days' configuration parameter"
 AWSSECURITYHUB_SCHEDULED_POLL_DAYS_KEY = "'scheduled_poll_days' configuration parameter"
+
+AWSSECURITYHUB_DEFAULT_REQUEST_TIMEOUT = 30  # in seconds
