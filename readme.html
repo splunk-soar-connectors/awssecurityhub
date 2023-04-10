@@ -30,7 +30,7 @@
 <h2>Ingesting Security Hub Findings from SQS</h2>
 <p>The following section explains how to configure the preferred means of ingesting findings from AWS, SQS polling.
 	These instructions leverage a CloudFormation template to set up the forwarding of Security Hub findings into an SQS
-	queue. Phantom in turn ingests the findings from this queue.</p>
+	queue. Splunk SOAR in turn ingests the findings from this queue.</p>
 <br>
 <p>Note that SQS-based polling will ignore the <b>poll_now_days</b> and <b>scheduled_poll_days</b> asset configuration
 	parameters.</p>
@@ -53,18 +53,18 @@
 <p><img src="https://splunkphantom.s3.amazonaws.com/images/PhantomCloudFormationOutputHighlighted.png"
 		alt="Cloud Formation Output"></p>
 
-<h3>2 - Configure your Phantom App Asset</h3>
+<h3>2 - Configure your Splunk SOAR App Asset</h3>
 
-<p>Next, login to your Splunk Phantom instance. If you are new to Phantom you can easily launch the Phantom Community
+<p>Next, login to your Splunk Splunk SOAR instance. If you are new to Splunk SOAR you can easily launch the Splunk SOAR Community
 	Edition available in the AWS Marketplace.</p>
 
-<p>Navigate to the &quot;Apps&quot; page in Phantom. Search for the Security Hub app - if you don&#39;t find it in your
+<p>Navigate to the &quot;Apps&quot; page in Splunk SOAR. Search for the Security Hub app - if you don&#39;t find it in your
 	search results, you may need to select the <em>New Apps</em> and install the app before proceeding. Select
 	&quot;Configure New Asset&quot; for the v1.1+ Security Hub App.</p>
 
 <blockquote>
-	<p><strong>Important</strong> These instructions require the Phantom Security Hub app v1.1 or higher - if you are
-		running an older version, be sure to upgrade it by selecting &quot;Upgrade Apps&quot; in your phantom instance
+	<p><strong>Important</strong> These instructions require the Splunk SOAR Security Hub app v1.1 or higher - if you are
+		running an older version, be sure to upgrade it by selecting &quot;Upgrade Apps&quot; in your splunk SOAR instance
 		or downloading the latest version of the app from my.phantom.us/apps and manually installing it. </p>
 </blockquote>
 
@@ -73,7 +73,7 @@
 
 <h3>App Configuration Parameters</h3>
 
-<p>Setting up the Security Hub Phantom app requires input on 3 configuration tabs.</p>
+<p>Setting up the Security Hub Splunk SOAR app requires input on 3 configuration tabs.</p>
 
 <h5>Asset Info</h5>
 
@@ -105,9 +105,9 @@
 <h3>Finalize the Configuration</h3>
 
 <p>Once you have configured the Asset Info, Ingest Settings, and Asset Settings select <em>Save</em> to finalize your
-	app configuration. You are now ready to start consuming Security Hub Findings in Phantom! </p>
+	app configuration. You are now ready to start consuming Security Hub Findings in Splunk SOAR! </p>
 
-<p>Any new Security Hub Findings will now appear on your Phantom &quot;Events&quot; page according to your polling
+<p>Any new Security Hub Findings will now appear on your Splunk SOAR &quot;Events&quot; page according to your polling
 	interval. Note that the integration relies on forwarding events from the Security Hub to the SQS queue, so the app
 	will only know about any findings that were created after the Cloud Formation template was run in Step 1. </p>
 

@@ -62,6 +62,12 @@ class AwsSecurityHubConnector(BaseConnector):
     def initialize(self):
 
         self._state = self.load_state()
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {"app_version": self.get_app_json().get("app_version")}
+            return self.set_status(
+                phantom.APP_ERROR, AWSSECURITYHUB_STATE_FILE_CORRUPT_ERROR
+            )
 
         config = self.get_config()
 
@@ -77,7 +83,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         self._region = AWSSECURITYHUB_REGION_DICT.get(config['region'])
         if not self._region:
-            return self.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_REGION_INVALID)
+            return self.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERROR_REGION_INVALID)
 
         if config.get('use_role'):
             credentials = self._handle_get_ec2_role()
@@ -94,7 +100,7 @@ class AwsSecurityHubConnector(BaseConnector):
         self._secret_key = config.get('secret_key')
 
         if not (self._access_key and self._secret_key):
-            return self.set_status(phantom.APP_ERROR, AWSSECURITYHUB_BAD_ASSET_CONFIG_ERR_MSG)
+            return self.set_status(phantom.APP_ERROR, AWSSECURITYHUB_BAD_ASSET_CONFIG_ERROR_MESSAGE)
 
         self._proxy = {}
         env_vars = config.get('_reserved_environment_variables', {})
@@ -112,32 +118,37 @@ class AwsSecurityHubConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error messages from the exception.
+        """
+        Get appropriate error message from the exception.
         :param e: Exception object
         :return: error message
         """
-        error_code = AWSSECURITYHUB_ERR_CODE_UNAVAILABLE
-        error_msg = AWSSECURITYHUB_ERR_MSG_UNAVAILABLE
+
+        error_code = AWSSECURITYHUB_ERROR_CODE_UNAVAILABLE
+        error_msg = AWSSECURITYHUB_ERROR_MESSAGE_UNAVAILABLE
+
+        self.error_print("Error occurred.", e)
 
         try:
-            if e.args:
+            if hasattr(e, "args"):
                 if len(e.args) > 1:
                     error_code = e.args[0]
                     error_msg = e.args[1]
-                elif len(e.args) == 1:
-                    error_code = AWSSECURITYHUB_ERR_CODE_UNAVAILABLE
-                    error_msg = e.args[0]
-        except:
-            pass
+            elif len(e.args) == 1:
+                error_msg = e.args[0]
+        except Exception as e:
+            self.error_print(
+                "Error occurred while fetching exception information. Details: {}".format(
+                    str(e)
+                )
+            )
 
-        try:
-            if error_code in AWSSECURITYHUB_ERR_CODE_UNAVAILABLE:
-                error_text = "Error Message: {0}".format(error_msg)
-            else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
-        except:
-            self.debug_print("Error occurred while parsing error message")
-            error_text = AWSSECURITYHUB_PARSE_ERR_MSG
+        if not error_code:
+            error_text = "Error Message: {}".format(error_msg)
+        else:
+            error_text = "Error Code: {}. Error Message: {}".format(
+                error_code, error_msg
+            )
 
         return error_text
 
@@ -155,16 +166,16 @@ class AwsSecurityHubConnector(BaseConnector):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_VALID_INT_MSG.format(param=key)), None
+                    return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_VALID_INT_MESSAGE.format(param=key)), None
 
                 parameter = int(parameter)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_VALID_INT_MSG.format(param=key)), None
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_VALID_INT_MESSAGE.format(param=key)), None
 
             if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_NON_NEG_INT_MSG.format(param=key)), None
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_NON_NEG_INT_MESSAGE.format(param=key)), None
             if not allow_zero and parameter == 0:
-                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_NON_NEG_NON_ZERO_INT_MSG.format(param=key)), None
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_NON_NEG_NON_ZERO_INT_MESSAGE.format(param=key)), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -206,8 +217,8 @@ class AwsSecurityHubConnector(BaseConnector):
                         config=boto_config)
 
         except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_BOTO3_CLIENT_NOT_CREATED.format(err=err))
+            error = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERROR_BOTO3_CLIENT_NOT_CREATED.format(error=error))
 
         return phantom.APP_SUCCESS
 
@@ -216,13 +227,13 @@ class AwsSecurityHubConnector(BaseConnector):
         try:
             boto_func = getattr(self._client, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_INVALID_METHOD.format(method=method)), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERROR_INVALID_METHOD.format(method=method)), None)
 
         try:
             resp_json = boto_func(**kwargs)
         except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_BOTO3_CALL_FAILED.format(err=err)), None)
+            error = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERROR_BOTO3_CALL_FAILED.format(error=error)), None)
 
         return phantom.APP_SUCCESS, resp_json
 
@@ -238,7 +249,7 @@ class AwsSecurityHubConnector(BaseConnector):
         ret_val, _ = self._make_boto_call(action_result, 'get_findings', MaxResults=1)
 
         if phantom.is_fail(ret_val):
-            self.save_progress(AWSSECURITYHUB_ERR_TEST_CONNECTIVITY)
+            self.save_progress(AWSSECURITYHUB_ERROR_TEST_CONNECTIVITY)
             return ret_val
 
         self.save_progress(AWSSECURITYHUB_SUCC_TEST_CONNECTIVITY)
@@ -336,7 +347,7 @@ class AwsSecurityHubConnector(BaseConnector):
             for message in resp_json['Messages']:
                 try:
                     message_dict = json.loads(message.get('Body', '{}'))
-                except:
+                except Exception:
                     self.debug_print("Skipping the following sqs message because of failure to extract finding object: {}".format(
                         message.get('Body', '{}')))
                     continue
@@ -502,12 +513,12 @@ class AwsSecurityHubConnector(BaseConnector):
                     try:
                         ipaddress.ip_address(str(ip_add))
                         ip_add_list.append({"Cidr": ip_add})
-                    except:
+                    except Exception:
                         self.debug_print('Resource ec2 IP validation failed for {}. '
                             'Hence, skipping this IP address from being added to the filter.'.format(ip_add))
 
             if not ip_add_list:
-                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_ALL_RESOURCE_IP_VALIDATION)
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERROR_ALL_RESOURCE_IP_VALIDATION)
 
             filters.update({
                 "ResourceAwsEc2InstanceIpV4Addresses": ip_add_list
@@ -526,7 +537,7 @@ class AwsSecurityHubConnector(BaseConnector):
                             'Hence, skipping this IP address from being added to the filter.'.format(ip_add))
 
             if not ip_add_list:
-                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_ALL_NETWORK_IP_VALIDATION)
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERROR_ALL_NETWORK_IP_VALIDATION)
 
             filters.update({
                 "NetworkSourceIpV4": ip_add_list
@@ -658,13 +669,13 @@ class AwsSecurityHubConnector(BaseConnector):
         for finding in list_findings:
             if finding.get('Id') == findings_id:
                 if record_state and finding.get('RecordState') == record_state:
-                    action_result.set_status(phantom.APP_SUCCESS, AWSSECURITYHUB_ERR_FINDING_ID_IN_RECORD_STATE.format(
+                    action_result.set_status(phantom.APP_SUCCESS, AWSSECURITYHUB_ERROR_FINDING_ID_IN_RECORD_STATE.format(
                         record_state=record_state))
                     return (True, False, finding)
                 valid_finding = finding
                 break
         else:
-            action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_INVALID_FINDING_ID)
+            action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERROR_INVALID_FINDING_ID)
             return (False, False, None)
 
         return (True, True, valid_finding)
