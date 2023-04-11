@@ -67,9 +67,9 @@ AWSSECURITYHUB_RESOURCE_CEF_TYPES = {
 
 AWSSECURITYHUB_ERROR_TEST_CONNECTIVITY = "Test Connectivity Failed"
 AWSSECURITYHUB_SUCC_TEST_CONNECTIVITY = "Test Connectivity Passed"
-AWSSECURITYHUB_ERR_REGION_INVALID = "Specified region is not valid"
+AWSSECURITYHUB_ERROR_REGION_INVALID = "Specified region is not valid"
 AWSSECURITYHUB_ERROR_BOTO3_CLIENT_NOT_CREATED = "Could not create boto3 client: {error}"
-AWSSECURITYHUB_ERR_INVALID_METHOD = "Invalid method: {method}"
+AWSSECURITYHUB_ERROR_INVALID_METHOD = "Invalid method: {method}"
 AWSSECURITYHUB_ERROR_BOTO3_CALL_FAILED = "Boto3 call to Security Hub failed: {error}"
 AWSSECURITYHUB_ERROR_ALL_RESOURCE_IP_VALIDATION = "Resource ec2 IP validation failed for all the provided IPs"
 AWSSECURITYHUB_ERROR_ALL_NETWORK_IP_VALIDATION = "Network source IP validation failed validation failed for all the provided IPs"

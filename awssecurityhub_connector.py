@@ -1,6 +1,6 @@
 # File: awssecurityhub_connector.py
 #
-# Copyright (c) 2019-2022 Splunk Inc.
+# Copyright (c) 2019-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ class AwsSecurityHubConnector(BaseConnector):
         """
 
         error_code = AWSSECURITYHUB_ERROR_CODE_UNAVAILABLE
-        error_msg = AWSSECURITYHUB_ERROR_MESSAGE_UNAVAILABLE
+        error_message = AWSSECURITYHUB_ERROR_MESSAGE_UNAVAILABLE
 
         self.error_print("Error occurred.", e)
 
@@ -133,9 +133,9 @@ class AwsSecurityHubConnector(BaseConnector):
             if hasattr(e, "args"):
                 if len(e.args) > 1:
                     error_code = e.args[0]
-                    error_msg = e.args[1]
+                    error_message = e.args[1]
             elif len(e.args) == 1:
-                error_msg = e.args[0]
+                error_message = e.args[0]
         except Exception as e:
             self.error_print(
                 "Error occurred while fetching exception information. Details: {}".format(
@@ -144,10 +144,10 @@ class AwsSecurityHubConnector(BaseConnector):
             )
 
         if not error_code:
-            error_text = "Error Message: {}".format(error_msg)
+            error_text = "Error Message: {}".format(error_message)
         else:
             error_text = "Error Code: {}. Error Message: {}".format(
-                error_code, error_msg
+                error_code, error_message
             )
 
         return error_text
@@ -267,13 +267,13 @@ class AwsSecurityHubConnector(BaseConnector):
         container_dict['source_data_identifier'] = finding['Id']
         container_dict['description'] = finding['Description']
 
-        container_creation_status, container_creation_msg, container_id = self.save_container(container=container_dict)
+        container_creation_status, container_creation_message, container_id = self.save_container(container=container_dict)
 
         if phantom.is_fail(container_creation_status):
-            self.debug_print(container_creation_msg)
+            self.debug_print(container_creation_message)
             self.save_progress('Error while creating container for finding {finding_id}. '
                                '{error_message}'.format(finding_id=finding['Id'],
-                                                        error_message=container_creation_msg))
+                                                        error_message=container_creation_message))
             return None
 
         return container_id
@@ -318,10 +318,10 @@ class AwsSecurityHubConnector(BaseConnector):
         finding_artifact['cef_types'] = AWSSECURITYHUB_FINDING_CEF_TYPES
         artifacts.append(finding_artifact)
 
-        create_artifact_status, create_artifact_msg, _ = self.save_artifacts(artifacts)
+        create_artifact_status, create_artifact_message, _ = self.save_artifacts(artifacts)
 
         if phantom.is_fail(create_artifact_status):
-            return phantom.APP_ERROR, create_artifact_msg
+            return phantom.APP_ERROR, create_artifact_message
 
         return phantom.APP_SUCCESS, 'Artifacts created successfully'
 
@@ -451,11 +451,11 @@ class AwsSecurityHubConnector(BaseConnector):
                 continue
 
             # Create artifacts for specific finding
-            artifacts_creation_status, artifacts_creation_msg = self._create_artifacts(finding=finding, container_id=container_id)
+            artifacts_creation_status, artifacts_creation_message = self._create_artifacts(finding=finding, container_id=container_id)
 
             if phantom.is_fail(artifacts_creation_status):
-                self.debug_print('Error while creating artifacts for container with ID {container_id}. {error_msg}'.
-                                 format(container_id=container_id, error_msg=artifacts_creation_msg))
+                self.debug_print('Error while creating artifacts for container with ID {container_id}. {error_message}'.
+                                 format(container_id=container_id, error_message=artifacts_creation_message))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
