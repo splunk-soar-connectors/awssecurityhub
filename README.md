@@ -2,7 +2,7 @@
 # AWS Security Hub
 
 Publisher: Splunk  
-Connector Version: 2.3.5  
+Connector Version: 2.4.0  
 Product Vendor: AWS  
 Product Name: Security Hub  
 Product Version Supported (regex): ".\*"  
@@ -80,8 +80,8 @@ Output](https://splunkphantom.s3.amazonaws.com/images/PhantomCloudFormationOutpu
 
 ### 2 - Configure your Splunk SOAR App Asset
 
-Next, login to your Splunk Splunk SOAR instance. If you are new to Splunk SOAR you can easily launch
-the Splunk SOAR Community Edition available in the AWS Marketplace.
+Next, login to your Splunk SOAR instance. If you are new to Splunk SOAR you can easily launch the
+Splunk SOAR Community Edition available in the AWS Marketplace.
 
 Navigate to the "Apps" page in Splunk SOAR. Search for the Security Hub app - if you don't find it
 in your search results, you may need to select the *New Apps* and install the app before proceeding.
