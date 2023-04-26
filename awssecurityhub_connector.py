@@ -256,7 +256,7 @@ class AwsSecurityHubConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _create_container(self, finding):
-        """ This function is used to create the container in Phantom using finding data.
+        """ This function is used to create the container in Splunk SOAR using finding data.
 
         :param finding: Data of single finding
         :return: container_id
@@ -713,7 +713,7 @@ class AwsSecurityHubConnector(BaseConnector):
             note = note + ('' if overwrite else ('\n\n' + finding['Note']['Text']))
 
             note1 = {
-                    'Text': '(Splunk Phantom - {0} time is {1}) {2}'.format('Archived updated', note_time, note),
+                    'Text': '(Splunk SOAR - {0} time is {1}) {2}'.format('Archived updated', note_time, note),
                     'UpdatedBy': 'automation-splunk'
             }
 
@@ -765,7 +765,7 @@ class AwsSecurityHubConnector(BaseConnector):
             note = note + ('' if overwrite else ('\n\n' + finding['Note']['Text']))
 
             note1 = {
-                    'Text': '(Splunk Phantom - {0} time is {1}) {2}'.format('Unarchived updated', note_time, note),
+                    'Text': '(Splunk SOAR - {0} time is {1}) {2}'.format('Unarchived updated', note_time, note),
                     'UpdatedBy': 'automation-splunk'
             }
 
@@ -811,7 +811,7 @@ class AwsSecurityHubConnector(BaseConnector):
         }
         note = note.replace("\\", "\\\\").replace('"', '\\"')
         note1 = {
-                'Text': '(Splunk Phantom - {0}) {1}'.format(note_time, note),
+                'Text': '(Splunk SOAR - {0}) {1}'.format(note_time, note),
                 'UpdatedBy': 'automation-splunk'
         }
 

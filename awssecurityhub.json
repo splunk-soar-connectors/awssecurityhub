@@ -142,7 +142,7 @@
             "order": 5
         },
         "use_role": {
-            "description": "Use attached role when running Phantom in EC2",
+            "description": "Use attached role when running Splunk SOAR in EC2",
             "data_type": "boolean",
             "default": false,
             "visibility": [
@@ -1361,7 +1361,7 @@
                     "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::S3::Bucket",
                     "data_type": "string",
                     "example_values": [
-                        "ssm-phantomapp"
+                        "ssm-app"
                     ]
                 },
                 {
@@ -2723,7 +2723,7 @@
                     "data_path": "action_result.data.*.Resources.*.Tags.Project",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "Splunk"
                     ]
                 },
                 {
@@ -2797,7 +2797,7 @@
                     "data_path": "action_result.data.*.Resources.*.Tags.purpose",
                     "data_type": "string",
                     "example_values": [
-                        "github-opensource-phantom-apps-testing"
+                        "github-opensource-apps-testing"
                     ]
                 },
                 {
