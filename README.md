@@ -383,7 +383,7 @@ action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallActio
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/city | string |  |  
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/city/cityName | string |  |   Ashburn 
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/country/countryName | string |  |   United States 
-action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lat | string |  |   39.0481 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lat | string |  |   40.0481 
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lon | string |  |   -77.4728 
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/ipAddressV4 | string |  |   3.238.239.205 
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/asn | string |  |   14618 
