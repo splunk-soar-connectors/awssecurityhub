@@ -256,9 +256,7 @@ action_result.data.\*.Network.SourceIpV6 | string |  `ip`  |
 action_result.data.\*.Network.SourceMac | string |  `mac address`  |  
 action_result.data.\*.Network.SourcePort | string |  `port`  |  
 action_result.data.\*.NextToken | string |  |   Long base64 encoded string 
-action_result.data.\*.Note.Text | string |  |   (test - 2019-06-20 09:41:25) test overwrite false
-
-(test - 2019-06-20 09:40:46) true 
+action_result.data.\*.Note.Text | string |  |   (test - 2019-06-20 09:41:25) test overwrite false (test - 2019-06-20 09:40:46) true 
 action_result.data.\*.Note.UpdatedAt | string |  |   2019-04-12T10:06:44.134Z 
 action_result.data.\*.Note.UpdatedBy | string |  |   automation-test 
 action_result.data.\*.ProductArn | string |  |   arn:aws:securityhub:us-east-1::product/aws/guardduty 
@@ -649,9 +647,7 @@ action_result.data.\*.Network.SourceIpV4 | string |  `aws security hub network s
 action_result.data.\*.Network.SourceIpV6 | string |  `ip`  |  
 action_result.data.\*.Network.SourceMac | string |  `mac address`  |  
 action_result.data.\*.Network.SourcePort | string |  `port`  |  
-action_result.data.\*.Note.Text | string |  |   (test test - 2019-06-20 09:41:25) test overwrite false
-
-(test test - 2019-06-20 09:40:46) true 
+action_result.data.\*.Note.Text | string |  |   (test test - 2019-06-20 09:41:25) test overwrite false (test test - 2019-06-20 09:40:46) true 
 action_result.data.\*.Note.UpdatedAt | string |  |   2019-04-12T10:06:44.134Z 
 action_result.data.\*.Note.UpdatedBy | string |  |   automation-test 
 action_result.data.\*.ProductArn | string |  |   arn:aws:securityhub:us-east-1::product/aws/guardduty 
