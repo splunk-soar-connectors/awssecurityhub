@@ -1467,7 +1467,7 @@
                     "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lat",
                     "data_type": "string",
                     "example_values": [
-                        "39.0481"
+                        "40.0481"
                     ]
                 },
                 {
