@@ -3555,6 +3555,161 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/actionType",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS_API_CALL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/api",
+                    "data_type": "string",
+                    "example_values": [
+                        "GetLayout"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/callerType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Remote IP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/city/cityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mumbai"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/country/countryName",
+                    "data_type": "string",
+                    "example_values": [
+                        "India"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lat",
+                    "data_type": "string",
+                    "example_values": [
+                        "19.0748"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lon",
+                    "data_type": "string",
+                    "example_values": [
+                        "72.8856"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "136.226.232.247"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "53813"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/asnOrg",
+                    "data_type": "string",
+                    "example_values": [
+                        "ZSCALER-INC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/isp",
+                    "data_type": "string",
+                    "example_values": [
+                        "Zscaler"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/org",
+                    "data_type": "string",
+                    "example_values": [
+                        "Zscaler"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/serviceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "cloudshell.amazonaws.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/type",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/archived",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/count",
+                    "data_type": "string",
+                    "example_values": [
+                        "1584"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/detectorId",
+                    "data_type": "string",
+                    "example_values": [
+                        "c8b6836865362e2b73f679f650bdaf16"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/eventFirstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2023-04-24T17:06:01.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/eventLastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2023-04-27T05:22:52.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/resourceRole",
+                    "data_type": "string",
+                    "example_values": [
+                        "TARGET"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/serviceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "guardduty"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.ProductFields.aws/securityhub/CompanyName",
                     "data_type": "string",
                     "example_values": [
@@ -3700,6 +3855,27 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsIamAccessKey.PrincipalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "157568067690"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsIamAccessKey.PrincipalName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Root"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsIamAccessKey.PrincipalType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Root"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Resources.*.Details.AwsIamAccessKey.UserName",
                     "data_type": "string",
                     "example_values": [
@@ -3772,6 +3948,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Sample",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.SchemaVersion",
                     "data_type": "string",
                     "example_values": [
@@ -3804,6 +3988,13 @@
                     "data_type": "numeric",
                     "example_values": [
                         2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SourceUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://us-east-1.console.aws.amazon.com/guardduty/home?region=us-east-1#/findings?macros=current&fId=32c3da20b4a8e7cc262e2b21a35f5c04"
                     ]
                 },
                 {
