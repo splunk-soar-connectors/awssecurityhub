@@ -718,7 +718,7 @@ action_result.data.\*.ProductFields.aws/securityhub/FindingId | string |  `aws a
 action_result.data.\*.ProductFields.aws/securityhub/ProductName | string |  |   GuardDuty 
 action_result.data.\*.ProductFields.aws/securityhub/SeverityLabel | string |  |   MEDIUM 
 action_result.data.\*.ProductFields.aws/securityhub/annotation | string |  |   Unable to describe the supporting AWS Config Rule, Please verify that you have enabled AWS Config. 
-action_result.data.\*.ProductFields.count | string |  |   92  159 
+action_result.data.\*.ProductFields.count | string |  |   159 
 action_result.data.\*.ProductFields.detectorId | string |  `md5`  |   123456abcdef1234abcdef 
 action_result.data.\*.ProductFields.resourceRole | string |  |   TARGET 
 action_result.data.\*.ProductName | string |  |   Security Hub 
