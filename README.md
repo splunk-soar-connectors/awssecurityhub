@@ -69,8 +69,11 @@ new Security Hub findings to an SQS Queue.
 CloudFormation Template:
 <https://splunkphantom.s3.amazonaws.com/cloud-formation/phantom-sechub-to-sqs.yaml>
 
-![Cloud Formation - Selecting the Phantom
+![Cloud Formation - Selecting the Splunk SOAR
 Template](https://splunkphantom.s3.amazonaws.com/images/PhantomSecHubToSQSCloudFormation.png)
+
+For detailed steps refer to the following documentation:  
+<https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stack.html>
 
 After the Cloud Formation stack has been created be sure to take note of the
 *securityHubToPhantomSQSURL* field in the output - you will need it later.
@@ -88,11 +91,11 @@ in your search results, you may need to select the *New Apps* and install the ap
 Select "Configure New Asset" for the v1.1+ Security Hub App.
 
 > **Important** These instructions require the Splunk SOAR Security Hub app v1.1 or higher - if you
-> are running an older version, be sure to upgrade it by selecting "Upgrade Apps" in your splunk
+> are running an older version, be sure to upgrade it by selecting "Upgrade Apps" in your Splunk
 > SOAR instance or downloading the latest version of the app from my.phantom.us/apps and manually
 > installing it.
 
-![Security Hub Phantom App
+![Security Hub Splunk SOAR App
 Configure](https://splunkphantom.s3.amazonaws.com/images/security-hub-app-asset.png)
 
 ### App Configuration Parameters
@@ -119,7 +122,7 @@ Supply values for the following fields:
 -   AWS Secret Key - The secret key associated with an IAM account
 -   SQS URL - The URL provided by the Cloud Formation template from part 1 of this guide
 
-![Security Hub Phantom App - Asset Settings
+![Security Hub Splunk SOAR App - Asset Settings
 Tab](https://splunkphantom.s3.amazonaws.com/images/phantom-sechub-app-assetsettings.png)
 
 ### Finalize the Configuration
@@ -147,7 +150,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **sqs_url** |  optional  | string | SQS URL
 **poll_now_days** |  required  | numeric | Poll last 'n' days for POLL NOW
 **scheduled_poll_days** |  required  | numeric | Poll last 'n' days for scheduled polling
-**use_role** |  optional  | boolean | Use attached role when running Phantom in EC2
+**use_role** |  optional  | boolean | Use attached role when running Splunk SOAR in EC2
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration  
@@ -216,6 +219,8 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.credentials | string |  `aws credentials`  |   {'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='} 
 action_result.parameter.is_archived | boolean |  |   False  True 
 action_result.parameter.limit | numeric |  |   150 
 action_result.parameter.network_source_ipv4 | string |  `aws security hub network source ip`  |   172.40.20.1 
@@ -224,12 +229,17 @@ action_result.parameter.resource_ec2_ipv4_addresses | string |  `aws security hu
 action_result.parameter.resource_id | string |  `aws security hub resource id`  `aws arn`  |   AWS::IAM::AccessKey:ABCDEFGH123456789  arn:aws:ec2:us-east-1:123456789012:instance/i-abcdefgh1234567 
 action_result.parameter.resource_region | string |  `aws security hub resource region`  |   us-east-1 
 action_result.data.\*.AwsAccountId | string |  |   ABCDEFGH123456789 
+action_result.data.\*.CompanyName | string |  |   AWS 
+action_result.data.\*.Compliance.AssociatedStandards.\*.StandardsId | string |  |   standards/aws-foundational-security-best-practices/v/1.0.0 
+action_result.data.\*.Compliance.SecurityControlId | string |  |   DynamoDB.2 
 action_result.data.\*.Compliance.Status | string |  |   WARNING 
 action_result.data.\*.Compliance.StatusReasons.\*.Description | string |  |   Unable to describe the supporting AWS Config Rule, Please verify that you have enabled AWS Config. 
 action_result.data.\*.Compliance.StatusReasons.\*.ReasonCode | string |  |   CONFIG_ACCESS_DENIED 
 action_result.data.\*.Confidence | numeric |  |   5 
 action_result.data.\*.CreatedAt | string |  |   2019-04-10T11:58:12.766Z 
 action_result.data.\*.Description | string |  |   EC2 instance has an unprotected port which is being probed by a known malicious host 
+action_result.data.\*.FindingProviderFields.Severity.Label | string |  |   MEDIUM 
+action_result.data.\*.FindingProviderFields.Severity.Original | string |  |   MEDIUM 
 action_result.data.\*.FirstObservedAt | string |  |   2019-04-10T11:48:10Z 
 action_result.data.\*.GeneratorId | string |  |   arn:aws:guardduty:us-east-1:123456789012:detector/abcd1234abcd1234abcd1234 
 action_result.data.\*.Id | string |  `aws security hub findings id`  |   arn:aws:guardduty:us-east-1:1234567890:detector/abcd1234abcd1234abcd1234/finding/abcd1234abcd1234abcd1234 
@@ -255,6 +265,7 @@ action_result.data.\*.ProductArn | string |  |   arn:aws:securityhub:us-east-1::
 action_result.data.\*.ProductFields.RecommendationUrl | string |  |   https://docs.aws.amazon.com/console/securityhub/standards-cis-2.9/remediation 
 action_result.data.\*.ProductFields.RelatedAWSResources:0/name | string |  |   securityhub-vpc-flow-logs-enabled-e8258e90 
 action_result.data.\*.ProductFields.RelatedAWSResources:0/type | string |  |   AWS::Config::ConfigRule 
+action_result.data.\*.ProductFields.Resources:0/Id | string |  |   arn:aws:dynamodb:us-east-1:157568067690:table/doNotDeleteTable 
 action_result.data.\*.ProductFields.RuleId | string |  |   2.9 
 action_result.data.\*.ProductFields.StandardsControlArn | string |  |   arn:aws:securityhub:us-east-1:157568067690:control/cis-aws-foundations-benchmark/v/1.2.0/2.9 
 action_result.data.\*.ProductFields.StandardsGuideArn | string |  |   arn:aws:securityhub:::ruleset/cis-aws-foundations-benchmark/v/1.2.0 
@@ -365,7 +376,7 @@ action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallActio
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::EC2::Instance | string |  |   i-99999999 
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::IAM::Role | string |  |   GeneratedFindingIAMRole 
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::IAM::User | string |  |   GeneratedFindingIAMUser 
-action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::S3::Bucket | string |  |   ssm-phantomapp 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::S3::Bucket | string |  |   ssm-app 
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/api | string |  |   DescribeNetworkInterfaces 
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/callerType | string |  |  
 action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/errorCode | string |  |   NoSuchEntityException 
@@ -528,7 +539,9 @@ action_result.data.\*.ProductFields.tags:0 | string |  |   OPEN_PERMISSIONS
 action_result.data.\*.ProductFields.tags:1 | string |  |   BASIC_ALERT 
 action_result.data.\*.ProductFields.themes:0/count | string |  |   1 
 action_result.data.\*.ProductFields.themes:0/theme | string |  |   encryption_key 
+action_result.data.\*.ProductName | string |  |   Security Hub 
 action_result.data.\*.RecordState | string |  |   ARCHIVED  ACTIVE 
+action_result.data.\*.Region | string |  |   us-east-1 
 action_result.data.\*.Remediation.Recommendation.Text | string |  |   v2 Release 
 action_result.data.\*.Remediation.Recommendation.Url | string |  |   https://docs.aws.amazon.com/console/securityhub/standards-cis-2.9/remediation 
 action_result.data.\*.Resources.\*.Details.AwsEc2Instance.IamInstanceProfileArn | string |  |   arn:aws:iam::157568067690:instance-profile/AmazonSSMRoleForInstancesQuickSetup 
@@ -558,7 +571,7 @@ action_result.data.\*.Resources.\*.Tags.GeneratedFindingInstaceTag1 | string |  
 action_result.data.\*.Resources.\*.Tags.GeneratedFindingInstaceTag2 | string |  |   GeneratedFindingInstaceTagValue2 
 action_result.data.\*.Resources.\*.Tags.JIRA | string |  |   PINF-000 
 action_result.data.\*.Resources.\*.Tags.Name | string |  |   test Enterprise Redux 
-action_result.data.\*.Resources.\*.Tags.Project | string |  |   Phantom 
+action_result.data.\*.Resources.\*.Tags.Project | string |  |   Splunk 
 action_result.data.\*.Resources.\*.Tags.Ticket | string |  |   PINF-000 
 action_result.data.\*.Resources.\*.Tags.aws:autoscaling:groupName | string |  |   test-group 
 action_result.data.\*.Resources.\*.Tags.aws:cloudformation:logical-id | string |  |   MinemeldInstance 
@@ -569,7 +582,7 @@ action_result.data.\*.Resources.\*.Tags.foo | string |  |   bar
 action_result.data.\*.Resources.\*.Tags.name | string |  |   PINF-000 
 action_result.data.\*.Resources.\*.Tags.new-key | string |  |   new-value 
 action_result.data.\*.Resources.\*.Tags.owner | string |  |   abc@test.com 
-action_result.data.\*.Resources.\*.Tags.purpose | string |  |   github-opensource-phantom-apps-testing 
+action_result.data.\*.Resources.\*.Tags.purpose | string |  |   github-opensource-apps-testing 
 action_result.data.\*.Resources.\*.Tags.userid | string |  |   testId 
 action_result.data.\*.Resources.\*.Type | string |  |   AwsEc2Instance 
 action_result.data.\*.ResponseMetadata.HTTPStatusCode | numeric |  |   200 
@@ -586,21 +599,11 @@ action_result.data.\*.Types | string |  |   TTPs/Initial Access/UnauthorizedAcce
 action_result.data.\*.UpdatedAt | string |  |   2019-04-11T22:35:03.677Z 
 action_result.data.\*.Workflow.Status | string |  |   NEW 
 action_result.data.\*.WorkflowState | string |  |   NEW 
-action_result.status | string |  |   success  failed 
-action_result.message | string |  |   Total findings: 2 
 action_result.summary.total_findings | numeric |  |   2 
 action_result.summary.total_groups | numeric |  |   2 
+action_result.message | string |  |   Total findings: 2 
 summary.total_objects | numeric |  |   1 
-summary.total_objects_successful | numeric |  |   1 
-action_result.parameter.credentials | string |  `aws credentials`  |   {'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='} 
-action_result.data.\*.Region | string |  |   us-east-1 
-action_result.data.\*.Compliance.SecurityControlId | string |  |   DynamoDB.2 
-action_result.data.\*.Compliance.AssociatedStandards.\*.StandardsId | string |  |   standards/aws-foundational-security-best-practices/v/1.0.0 
-action_result.data.\*.CompanyName | string |  |   AWS 
-action_result.data.\*.ProductName | string |  |   Security Hub 
-action_result.data.\*.ProductFields.Resources:0/Id | string |  |   arn:aws:dynamodb:us-east-1:157568067690:table/doNotDeleteTable 
-action_result.data.\*.FindingProviderFields.Severity.Label | string |  |   MEDIUM 
-action_result.data.\*.FindingProviderFields.Severity.Original | string |  |   MEDIUM   
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get related findings'
 Lists Security Hub aggregated findings that are specified by filter attributes
@@ -617,13 +620,20 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.credentials | string |  `aws credentials`  |   {'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='} 
 action_result.parameter.findings_id | string |  `aws security hub findings id`  `aws arn`  |   arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef/finding/1234abcd12abab1ab12123456abcdef 
 action_result.data.\*.AwsAccountId | string |  |   01234567890 
+action_result.data.\*.CompanyName | string |  |   AWS 
+action_result.data.\*.Compliance.AssociatedStandards.\*.StandardsId | string |  |   standards/aws-foundational-security-best-practices/v/1.0.0 
+action_result.data.\*.Compliance.SecurityControlId | string |  |   DynamoDB.2 
 action_result.data.\*.Compliance.Status | string |  |   WARNING 
 action_result.data.\*.Compliance.StatusReasons.\*.Description | string |  |   Unable to describe the supporting AWS Config Rule, Please verify that you have enabled AWS Config. 
 action_result.data.\*.Compliance.StatusReasons.\*.ReasonCode | string |  |   CONFIG_ACCESS_DENIED 
 action_result.data.\*.CreatedAt | string |  |   2019-04-10T11:58:12.766Z 
 action_result.data.\*.Description | string |  |   EC2 instance has an unprotected port which is being probed by a known malicious host 
+action_result.data.\*.FindingProviderFields.Severity.Label | string |  |   MEDIUM 
+action_result.data.\*.FindingProviderFields.Severity.Original | string |  |   MEDIUM 
 action_result.data.\*.FirstObservedAt | string |  |   2019-04-10T11:48:10Z 
 action_result.data.\*.GeneratorId | string |  |   arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef 
 action_result.data.\*.Id | string |  `aws security hub findings id`  |   arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef/finding/1234abcd12abab1ab12123456abcdef 
@@ -648,6 +658,7 @@ action_result.data.\*.ProductArn | string |  |   arn:aws:securityhub:us-east-1::
 action_result.data.\*.ProductFields.RecommendationUrl | string |  |   https://docs.aws.amazon.com/console/securityhub/standards-cis-2.7/remediation 
 action_result.data.\*.ProductFields.RelatedAWSResources:0/name | string |  |   securityhub-cloud-trail-encryption-enabled-e8fd8829 
 action_result.data.\*.ProductFields.RelatedAWSResources:0/type | string |  |   AWS::Config::ConfigRule 
+action_result.data.\*.ProductFields.Resources:0/Id | string |  |   arn:aws:dynamodb:us-east-1:157568067690:table/doNotDeleteTable 
 action_result.data.\*.ProductFields.RuleId | string |  |   2.7 
 action_result.data.\*.ProductFields.StandardsControlArn | string |  |   arn:aws:securityhub:us-east-1:157568067690:control/cis-aws-foundations-benchmark/v/1.2.0/2.7 
 action_result.data.\*.ProductFields.StandardsGuideArn | string |  |   arn:aws:securityhub:::ruleset/cis-aws-foundations-benchmark/v/1.2.0 
@@ -679,6 +690,29 @@ action_result.data.\*.ProductFields.action/portProbeAction/portProbeDetails:0/re
 action_result.data.\*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/organization/org | string |  |   Test S.A. 
 action_result.data.\*.ProductFields.additionalInfo | string |  |   {"threatName":"Scanner","threatListName":"ThreatListName"} 
 action_result.data.\*.ProductFields.archived | string |  |   false 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/actionType | string |  |   AWS_API_CALL 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources | string |  |  
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/api | string |  |   GetLayout 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/callerType | string |  |   Remote IP 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/city/cityName | string |  |   Mumbai 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/country/countryName | string |  |   India 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lat | string |  |   19.0748 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lon | string |  |   72.8856 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/ipAddressV4 | string |  |   136.226.232.247 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/asn | string |  |   53813 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/asnOrg | string |  |   ZSCALER-INC 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/isp | string |  |   Zscaler 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/org | string |  |   Zscaler 
+action_result.data.\*.ProductFields.aws/guardduty/service/action/awsApiCallAction/serviceName | string |  |   cloudshell.amazonaws.com 
+action_result.data.\*.ProductFields.aws/guardduty/service/additionalInfo/type | string |  |   default 
+action_result.data.\*.ProductFields.aws/guardduty/service/additionalInfo/value | string |  |  
+action_result.data.\*.ProductFields.aws/guardduty/service/archived | string |  |   false 
+action_result.data.\*.ProductFields.aws/guardduty/service/count | string |  |   1584 
+action_result.data.\*.ProductFields.aws/guardduty/service/detectorId | string |  |   c8b6836865362e2b73f679f650bdaf16 
+action_result.data.\*.ProductFields.aws/guardduty/service/eventFirstSeen | string |  |   2023-04-24T17:06:01.000Z 
+action_result.data.\*.ProductFields.aws/guardduty/service/eventLastSeen | string |  |   2023-04-27T05:22:52.000Z 
+action_result.data.\*.ProductFields.aws/guardduty/service/resourceRole | string |  |   TARGET 
+action_result.data.\*.ProductFields.aws/guardduty/service/serviceName | string |  |   guardduty 
 action_result.data.\*.ProductFields.aws/securityhub/CompanyName | string |  |   test 
 action_result.data.\*.ProductFields.aws/securityhub/FindingId | string |  `aws arn`  |   arn:aws:securityhub:us-east-1::product/aws/guardduty/arn:aws:guardduty:us-east-1:123456789012:detector/123456abcdef1234abcdef/finding/123456abcdef1234abcdef 
 action_result.data.\*.ProductFields.aws/securityhub/ProductName | string |  |   GuardDuty 
@@ -687,7 +721,9 @@ action_result.data.\*.ProductFields.aws/securityhub/annotation | string |  |   U
 action_result.data.\*.ProductFields.count | string |  |   92  159 
 action_result.data.\*.ProductFields.detectorId | string |  `md5`  |   123456abcdef1234abcdef 
 action_result.data.\*.ProductFields.resourceRole | string |  |   TARGET 
+action_result.data.\*.ProductName | string |  |   Security Hub 
 action_result.data.\*.RecordState | string |  |   ARCHIVED  ACTIVE 
+action_result.data.\*.Region | string |  |   us-east-1 
 action_result.data.\*.Remediation.Recommendation.Text | string |  |   For directions on how to fix this issue, please consult the AWS Security Hub CIS documentation. 
 action_result.data.\*.Remediation.Recommendation.Url | string |  |   https://docs.aws.amazon.com/console/securityhub/standards-cis-2.7/remediation 
 action_result.data.\*.Resources.\*.Details.AwsEc2Instance.ImageId | string |  |   ami-123456abcdef1234a 
@@ -696,6 +732,9 @@ action_result.data.\*.Resources.\*.Details.AwsEc2Instance.LaunchedAt | string | 
 action_result.data.\*.Resources.\*.Details.AwsEc2Instance.SubnetId | string |  |   subnet-123456abcdef 
 action_result.data.\*.Resources.\*.Details.AwsEc2Instance.Type | string |  |   t2.micro 
 action_result.data.\*.Resources.\*.Details.AwsEc2Instance.VpcId | string |  |   vpc-513464894 
+action_result.data.\*.Resources.\*.Details.AwsIamAccessKey.PrincipalId | string |  |   157568067690 
+action_result.data.\*.Resources.\*.Details.AwsIamAccessKey.PrincipalName | string |  |   Root 
+action_result.data.\*.Resources.\*.Details.AwsIamAccessKey.PrincipalType | string |  |   Root 
 action_result.data.\*.Resources.\*.Details.AwsIamAccessKey.UserName | string |  |   Root 
 action_result.data.\*.Resources.\*.Id | string |  `aws security hub resource id`  |   arn:aws:ec2:us-east-1:123456789012:instance/i-123456abcdef1234ab 
 action_result.data.\*.Resources.\*.InstanceId | string |  `aws ec2 instance id`  |   i-123456abcdef1234abcdef 
@@ -705,31 +744,23 @@ action_result.data.\*.Resources.\*.Tags.Name | string |  |   test-actions
 action_result.data.\*.Resources.\*.Tags.aws:autoscaling:groupName | string |  |   test-group 
 action_result.data.\*.Resources.\*.Tags.new-key | string |  |   new-value 
 action_result.data.\*.Resources.\*.Type | string |  |   AwsEc2Instance 
+action_result.data.\*.Sample | boolean |  |   True  False 
 action_result.data.\*.SchemaVersion | string |  |   2018-10-08 
 action_result.data.\*.Severity.Label | string |  |   MEDIUM 
 action_result.data.\*.Severity.Normalized | numeric |  |   40 
 action_result.data.\*.Severity.Original | string |  |   MEDIUM 
 action_result.data.\*.Severity.Product | numeric |  |   2 
+action_result.data.\*.SourceUrl | string |  |   https://us-east-1.console.aws.amazon.com/guardduty/home?region=us-east-1#/findings?macros=current&fId=32c3da20b4a8e7cc262e2b21a35f5c04 
 action_result.data.\*.Title | string |  |   Unprotected port on EC2 instance i-123456abcdef1234abcd is being probed 
 action_result.data.\*.Types | string |  |   TTPs/Discovery/Recon:EC2-PortProbeUnprotectedPort 
 action_result.data.\*.UpdatedAt | string |  |   2019-04-11T22:35:03.677Z 
 action_result.data.\*.Workflow.Status | string |  |   NEW 
 action_result.data.\*.WorkflowState | string |  |   NEW 
-action_result.status | string |  |   success  failed 
-action_result.message | string |  |   Total findings: 1 
 action_result.summary.total_findings | numeric |  |   1 
 action_result.summary.total_groups | numeric |  |   1 
+action_result.message | string |  |   Total findings: 1 
 summary.total_objects | numeric |  |   1 
-summary.total_objects_successful | numeric |  |   1 
-action_result.parameter.credentials | string |  `aws credentials`  |   {'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='} 
-action_result.data.\*.Region | string |  |   us-east-1 
-action_result.data.\*.Compliance.SecurityControlId | string |  |   DynamoDB.2 
-action_result.data.\*.Compliance.AssociatedStandards.\*.StandardsId | string |  |   standards/aws-foundational-security-best-practices/v/1.0.0 
-action_result.data.\*.CompanyName | string |  |   AWS 
-action_result.data.\*.ProductName | string |  |   Security Hub 
-action_result.data.\*.ProductFields.Resources:0/Id | string |  |   arn:aws:dynamodb:us-east-1:157568067690:table/doNotDeleteTable 
-action_result.data.\*.FindingProviderFields.Severity.Label | string |  |   MEDIUM 
-action_result.data.\*.FindingProviderFields.Severity.Original | string |  |   MEDIUM   
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'archive findings'
 Archive the AWS Security Hub aggregated findings specified by the filter attributes
@@ -748,9 +779,16 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.credentials | string |  `aws credentials`  |   {'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='} 
 action_result.parameter.findings_id | string |  `aws security hub findings id`  `aws arn`  |   arn:aws:guardduty:us-east-1123456789012detector/123456abcdef1234abcdef123456abcdef1234abcdef/finding/123456abcdef1234abcdef 
 action_result.parameter.note | string |  |   note for archive findings 
 action_result.parameter.overwrite | boolean |  |   True  False 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-headers | string |  |   Authorization,Date,X-Amz-Date,X-Amz-Security-Token,X-Amz-Target,content-type,x-amz-content-sha256,x-amz-user-agent,x-amzn-platform-id,x-amzn-trace-id 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-methods | string |  |   GET,POST,OPTIONS,PUT,PATCH,DELETE 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-origin | string |  |   \* 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-expose-headers | string |  |   x-amzn-errortype,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,date 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-max-age | string |  |   86400 
 action_result.data.\*.ResponseMetadata.HTTPHeaders.connection | string |  |   keep-alive 
 action_result.data.\*.ResponseMetadata.HTTPHeaders.content-length | string |  |   2 
 action_result.data.\*.ResponseMetadata.HTTPHeaders.content-type | string |  |   application/json 
@@ -761,18 +799,11 @@ action_result.data.\*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id | string |  |
 action_result.data.\*.ResponseMetadata.HTTPStatusCode | numeric |  |   200 
 action_result.data.\*.ResponseMetadata.RequestId | string |  |   1234abcd-12ab-ab12-ab12-123456abcdef 
 action_result.data.\*.ResponseMetadata.RetryAttempts | numeric |  |   0 
-action_result.status | string |  |   success  failed 
-action_result.message | string |  |   Archive note: Added successfully, Archived status: Successful 
 action_result.summary.archive_note | string |  |   Added successfully  Error occurred while adding note  Note is not added as it is not provided in the input parameters of the action 
 action_result.summary.archived_status | string |  |   Successful  Failed 
+action_result.message | string |  |   Archive note: Added successfully, Archived status: Successful 
 summary.total_objects | numeric |  |   1 
-summary.total_objects_successful | numeric |  |   1 
-action_result.parameter.credentials | string |  `aws credentials`  |   {'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='} 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-max-age | string |  |   86400 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-origin | string |  |   \* 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-headers | string |  |   Authorization,Date,X-Amz-Date,X-Amz-Security-Token,X-Amz-Target,content-type,x-amz-content-sha256,x-amz-user-agent,x-amzn-platform-id,x-amzn-trace-id 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-methods | string |  |   GET,POST,OPTIONS,PUT,PATCH,DELETE 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-expose-headers | string |  |   x-amzn-errortype,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,date   
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'unarchive findings'
 Unarchive the AWS Security Hub aggregated findings specified by the filter attributes
@@ -791,9 +822,16 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.credentials | string |  `aws credentials`  |   {'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='} 
 action_result.parameter.findings_id | string |  `aws security hub findings id`  `aws arn`  |   arn:aws:guardduty:us-east-1:123456789012:detector/123456abcdef1234abcdef123456abcdef1234abcdef/finding/123456abcdef1234abcdef123456abcdef1234abcdef 
 action_result.parameter.note | string |  |   Unarchive 
 action_result.parameter.overwrite | boolean |  |   True  False 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-headers | string |  |   Authorization,Date,X-Amz-Date,X-Amz-Security-Token,X-Amz-Target,content-type,x-amz-content-sha256,x-amz-user-agent,x-amzn-platform-id,x-amzn-trace-id 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-methods | string |  |   GET,POST,OPTIONS,PUT,PATCH,DELETE 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-origin | string |  |   \* 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-expose-headers | string |  |   x-amzn-errortype,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,date 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-max-age | string |  |   86400 
 action_result.data.\*.ResponseMetadata.HTTPHeaders.connection | string |  |   keep-alive 
 action_result.data.\*.ResponseMetadata.HTTPHeaders.content-length | string |  |   2 
 action_result.data.\*.ResponseMetadata.HTTPHeaders.content-type | string |  |   application/json 
@@ -804,18 +842,11 @@ action_result.data.\*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id | string |  |
 action_result.data.\*.ResponseMetadata.HTTPStatusCode | numeric |  |   200 
 action_result.data.\*.ResponseMetadata.RequestId | string |  |   1234abcd-12ab-ab12-ab12-123456abcdef 
 action_result.data.\*.ResponseMetadata.RetryAttempts | numeric |  |   0 
-action_result.status | string |  |   success  failed 
-action_result.message | string |  |   Unarchive note: Added successfully, Unarchived status: Successful 
 action_result.summary.unarchive_note | string |  |   Added successfully  Error occurred while adding note  Note is not added as it is not provided in the input parameters of the action 
 action_result.summary.unarchived_status | string |  |   Successful  Failed 
+action_result.message | string |  |   Unarchive note: Added successfully, Unarchived status: Successful 
 summary.total_objects | numeric |  |   1 
-summary.total_objects_successful | numeric |  |   1 
-action_result.parameter.credentials | string |  `aws credentials`  |   {'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='} 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-max-age | string |  |   86400 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-origin | string |  |   \* 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-headers | string |  |   Authorization,Date,X-Amz-Date,X-Amz-Security-Token,X-Amz-Target,content-type,x-amz-content-sha256,x-amz-user-agent,x-amzn-platform-id,x-amzn-trace-id 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-methods | string |  |   GET,POST,OPTIONS,PUT,PATCH,DELETE 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-expose-headers | string |  |   x-amzn-errortype,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,date   
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'add note'
 Add Note to the AWS Security Hub aggregated findings specified by the filter attributes
@@ -834,9 +865,16 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.credentials | string |  `aws credentials`  |   {'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='} 
 action_result.parameter.findings_id | string |  `aws security hub findings id`  `aws arn`  |   arn:aws:guardduty:us-east-1:123456789012:detector/123456789abcdefghi1234ab/finding/123456789abcdefghi1234ab 
 action_result.parameter.note | string |  |   note for findings 
 action_result.parameter.overwrite | boolean |  |   True  False 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-headers | string |  |   Authorization,Date,X-Amz-Date,X-Amz-Security-Token,X-Amz-Target,content-type,x-amz-content-sha256,x-amz-user-agent,x-amzn-platform-id,x-amzn-trace-id 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-methods | string |  |   GET,POST,OPTIONS,PUT,PATCH,DELETE 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-origin | string |  |   \* 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-expose-headers | string |  |   x-amzn-errortype,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,date 
+action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-max-age | string |  |   86400 
 action_result.data.\*.ResponseMetadata.HTTPHeaders.connection | string |  |   keep-alive 
 action_result.data.\*.ResponseMetadata.HTTPHeaders.content-length | string |  |   2 
 action_result.data.\*.ResponseMetadata.HTTPHeaders.content-type | string |  |   application/json 
@@ -847,14 +885,7 @@ action_result.data.\*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id | string |  |
 action_result.data.\*.ResponseMetadata.HTTPStatusCode | numeric |  |   200 
 action_result.data.\*.ResponseMetadata.RequestId | string |  |   1234abcd-12ab-ab12-ab12-123456abcdef 
 action_result.data.\*.ResponseMetadata.RetryAttempts | numeric |  |   0 
-action_result.status | string |  |   success  failed 
-action_result.message | string |  |   Note added successfully to the provided findings ID 
 action_result.summary.add_note | string |  |   Success 
+action_result.message | string |  |   Note added successfully to the provided findings ID 
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1 
-action_result.parameter.credentials | string |  `aws credentials`  |   {'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='} 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-max-age | string |  |   86400 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-origin | string |  |   \* 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-headers | string |  |   Authorization,Date,X-Amz-Date,X-Amz-Security-Token,X-Amz-Target,content-type,x-amz-content-sha256,x-amz-user-agent,x-amzn-platform-id,x-amzn-trace-id 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-allow-methods | string |  |   GET,POST,OPTIONS,PUT,PATCH,DELETE 
-action_result.data.\*.ResponseMetadata.HTTPHeaders.access-control-expose-headers | string |  |   x-amzn-errortype,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,date 
