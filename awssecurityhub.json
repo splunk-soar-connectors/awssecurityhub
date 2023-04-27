@@ -581,7 +581,7 @@
                     "data_path": "action_result.data.*.Note.Text",
                     "data_type": "string",
                     "example_values": [
-                        "(test - 2019-06-20 09:41:25) test overwrite false\n\n(test - 2019-06-20 09:40:46) true"
+                        "(test - 2019-06-20 09:41:25) test overwrite false (test - 2019-06-20 09:40:46) true"
                     ]
                 },
                 {
@@ -3277,7 +3277,7 @@
                     "data_path": "action_result.data.*.Note.Text",
                     "data_type": "string",
                     "example_values": [
-                        "(test test - 2019-06-20 09:41:25) test overwrite false\n\n(test test - 2019-06-20 09:40:46) true"
+                        "(test test - 2019-06-20 09:41:25) test overwrite false (test test - 2019-06-20 09:40:46) true"
                     ]
                 },
                 {
