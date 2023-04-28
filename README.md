@@ -92,8 +92,8 @@ Select "Configure New Asset" for the v1.1+ Security Hub App.
 
 > **Important** These instructions require the Splunk SOAR Security Hub app v1.1 or higher - if you
 > are running an older version, be sure to upgrade it by selecting "Upgrade Apps" in your Splunk
-> SOAR instance or downloading the latest version of the app from my.phantom.us/apps and manually
-> installing it.
+> SOAR instance or downloading the latest version of the app from
+> [Splunkbase](https://splunkbase.splunk.com/apps) and manually installing it.
 
 ![Security Hub Splunk SOAR App
 Configure](https://splunkphantom.s3.amazonaws.com/images/security-hub-app-asset.png)
