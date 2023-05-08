@@ -18,7 +18,7 @@
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
-        "Cloud API, April 12, 2023"
+        "Cloud API, May 7, 2023"
     ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
