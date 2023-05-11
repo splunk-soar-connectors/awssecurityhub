@@ -9,16 +9,16 @@
     "product_name": "Security Hub",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2022 Splunk Inc.",
-    "app_version": "2.3.5",
+    "license": "Copyright (c) 2019-2023 Splunk Inc.",
+    "app_version": "2.4.0",
     "utctime_updated": "2022-01-31T20:18:33.000000Z",
     "package_name": "phantom_awssecurityhub",
     "main_module": "awssecurityhub_connector.py",
-    "min_phantom_version": "5.1.0",
+    "min_phantom_version": "5.5.0",
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
-        "Cloud API, July 28, 2021"
+        "Cloud API, May 7, 2023"
     ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
@@ -93,18 +93,32 @@
                 "US East (N. Virginia)",
                 "US West (N. California)",
                 "US West (Oregon)",
-                "Canada (Central)",
+                "Africa (Cape Town)",
+                "Asia Pacific (Hong Kong)",
+                "Asia Pacific (Hyderabad)",
+                "Asia Pacific (Jakarta)",
                 "Asia Pacific (Mumbai)",
-                "Asia Pacific (Tokyo)",
+                "Asia Pacific (Osaka)",
                 "Asia Pacific (Seoul)",
                 "Asia Pacific (Singapore)",
                 "Asia Pacific (Sydney)",
+                "Asia Pacific (Tokyo)",
                 "China (Ningxia)",
-                "EU (Frankfurt)",
-                "EU (Ireland)",
-                "EU (London)",
-                "EU (Paris)",
-                "South America (Sao Paulo)"
+                "China (Beijing)",
+                "Canada (Central)",
+                "Europe (Frankfurt)",
+                "Europe (Ireland)",
+                "Europe (London)",
+                "Europe (Milan)",
+                "Europe (Paris)",
+                "Europe (Spain)",
+                "Europe (Stockholm)",
+                "Europe (Zurich)",
+                "Middle East (Bahrain)",
+                "Middle East (UAE)",
+                "South America (Sao Paulo)",
+                "AWS GovCloud (US-East)",
+                "AWS GovCloud (US-West)"
             ],
             "order": 2
         },
@@ -128,7 +142,7 @@
             "order": 5
         },
         "use_role": {
-            "description": "Use attached role when running Phantom in EC2",
+            "description": "Use attached role when running Splunk SOAR in EC2",
             "data_type": "boolean",
             "default": false,
             "visibility": [
@@ -191,18 +205,7 @@
                     "order": 5
                 }
             },
-            "output": [
-                {
-                    "data_path": "action_result.parameter.credentials",
-                    "data_type": "string",
-                    "example_values": [
-                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
-                    ],
-                    "contains": [
-                        "aws credentials"
-                    ]
-                }
-            ],
+            "output": [],
             "versions": "EQ(*)"
         },
         {
@@ -281,6 +284,24 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.is_archived",
                     "data_type": "boolean",
                     "example_values": [
@@ -300,6 +321,9 @@
                     "data_type": "string",
                     "contains": [
                         "aws security hub network source ip"
+                    ],
+                    "example_values": [
+                        "172.40.20.1"
                     ]
                 },
                 {
@@ -307,6 +331,9 @@
                     "data_type": "string",
                     "contains": [
                         "mac address"
+                    ],
+                    "example_values": [
+                        "00:00:5e:00:53:af"
                     ]
                 },
                 {
@@ -346,6 +373,27 @@
                     "data_type": "string",
                     "example_values": [
                         "ABCDEFGH123456789"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.CompanyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Compliance.AssociatedStandards.*.StandardsId",
+                    "data_type": "string",
+                    "example_values": [
+                        "standards/aws-foundational-security-best-practices/v/1.0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Compliance.SecurityControlId",
+                    "data_type": "string",
+                    "example_values": [
+                        "DynamoDB.2"
                     ]
                 },
                 {
@@ -391,6 +439,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.FindingProviderFields.Severity.Label",
+                    "data_type": "string",
+                    "example_values": [
+                        "MEDIUM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.FindingProviderFields.Severity.Original",
+                    "data_type": "string",
+                    "example_values": [
+                        "MEDIUM"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.FirstObservedAt",
                     "data_type": "string",
                     "example_values": [
@@ -418,7 +480,6 @@
                     "data_path": "action_result.data.*.LastObservedAt",
                     "data_type": "string",
                     "example_values": [
-                        "2019-04-11T05:50:40Z",
                         "2019-04-11T22:24:14Z"
                     ]
                 },
@@ -509,14 +570,13 @@
                     "data_path": "action_result.data.*.Note.Text",
                     "data_type": "string",
                     "example_values": [
-                        "(test - 2019-06-20 09:41:25) test overwrite false\n\n(test - 2019-06-20 09:40:46) true"
+                        "(test - 2019-06-20 09:41:25) test overwrite false (test - 2019-06-20 09:40:46) true"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Note.UpdatedAt",
                     "data_type": "string",
                     "example_values": [
-                        "2019-04-11T08:57:51.917Z",
                         "2019-04-12T10:06:44.134Z"
                     ]
                 },
@@ -553,6 +613,13 @@
                     "data_type": "string",
                     "example_values": [
                         "AWS::Config::ConfigRule"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.Resources:0/Id",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:dynamodb:us-east-1:157568067690:table/doNotDeleteTable"
                     ]
                 },
                 {
@@ -871,16 +938,14 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/organization/isp",
                     "data_type": "string",
                     "example_values": [
-                        "Test S.A.",
-                        "Test Mobile Place"
+                        "Test S.A."
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/organization/org",
                     "data_type": "string",
                     "example_values": [
-                        "Test S.A.",
-                        "Test Mobile"
+                        "Test S.A."
                     ]
                 },
                 {
@@ -1345,7 +1410,7 @@
                     "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::S3::Bucket",
                     "data_type": "string",
                     "example_values": [
-                        "ssm-phantomapp"
+                        "ssm-app"
                     ]
                 },
                 {
@@ -1391,7 +1456,7 @@
                     "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lat",
                     "data_type": "string",
                     "example_values": [
-                        "39.0481"
+                        "40.0481"
                     ]
                 },
                 {
@@ -2375,7 +2440,6 @@
                     "data_path": "action_result.data.*.ProductFields.count",
                     "data_type": "string",
                     "example_values": [
-                        "92",
                         "159"
                     ]
                 },
@@ -2481,11 +2545,25 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.ProductName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Security Hub"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.RecordState",
                     "data_type": "string",
                     "example_values": [
                         "ARCHIVED",
                         "ACTIVE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Region",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-east-1"
                     ]
                 },
                 {
@@ -2708,7 +2786,7 @@
                     "data_path": "action_result.data.*.Resources.*.Tags.Project",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "Splunk"
                     ]
                 },
                 {
@@ -2782,7 +2860,7 @@
                     "data_path": "action_result.data.*.Resources.*.Tags.purpose",
                     "data_type": "string",
                     "example_values": [
-                        "github-opensource-phantom-apps-testing"
+                        "github-opensource-apps-testing"
                     ]
                 },
                 {
@@ -2880,7 +2958,6 @@
                     "data_path": "action_result.data.*.UpdatedAt",
                     "data_type": "string",
                     "example_values": [
-                        "2019-04-11T06:01:08.185Z",
                         "2019-04-11T22:35:03.677Z"
                     ]
                 },
@@ -2899,21 +2976,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Total findings: 2"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.total_findings",
                     "data_type": "numeric",
                     "example_values": [
@@ -2928,6 +2990,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total findings: 2"
+                    ]
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -2939,16 +3008,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.credentials",
-                    "data_type": "string",
-                    "example_values": [
-                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
-                    ],
-                    "contains": [
-                        "aws credentials"
                     ]
                 }
             ],
@@ -2991,6 +3050,24 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
@@ -3006,6 +3083,27 @@
                     "data_type": "string",
                     "example_values": [
                         "01234567890"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.CompanyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Compliance.AssociatedStandards.*.StandardsId",
+                    "data_type": "string",
+                    "example_values": [
+                        "standards/aws-foundational-security-best-practices/v/1.0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Compliance.SecurityControlId",
+                    "data_type": "string",
+                    "example_values": [
+                        "DynamoDB.2"
                     ]
                 },
                 {
@@ -3044,6 +3142,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.FindingProviderFields.Severity.Label",
+                    "data_type": "string",
+                    "example_values": [
+                        "MEDIUM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.FindingProviderFields.Severity.Original",
+                    "data_type": "string",
+                    "example_values": [
+                        "MEDIUM"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.FirstObservedAt",
                     "data_type": "string",
                     "example_values": [
@@ -3071,7 +3183,6 @@
                     "data_path": "action_result.data.*.LastObservedAt",
                     "data_type": "string",
                     "example_values": [
-                        "2019-04-11T05:50:40Z",
                         "2019-04-11T22:24:14Z"
                     ]
                 },
@@ -3155,14 +3266,13 @@
                     "data_path": "action_result.data.*.Note.Text",
                     "data_type": "string",
                     "example_values": [
-                        "(test test - 2019-06-20 09:41:25) test overwrite false\n\n(test test - 2019-06-20 09:40:46) true"
+                        "(test test - 2019-06-20 09:41:25) test overwrite false (test test - 2019-06-20 09:40:46) true"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Note.UpdatedAt",
                     "data_type": "string",
                     "example_values": [
-                        "2019-04-11T08:57:51.917Z",
                         "2019-04-12T10:06:44.134Z"
                     ]
                 },
@@ -3199,6 +3309,13 @@
                     "data_type": "string",
                     "example_values": [
                         "AWS::Config::ConfigRule"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.Resources:0/Id",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:dynamodb:us-east-1:157568067690:table/doNotDeleteTable"
                     ]
                 },
                 {
@@ -3395,24 +3512,21 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/organization/asnOrg",
                     "data_type": "string",
                     "example_values": [
-                        "Test B.v.",
-                        "Test Mobile communications corporation"
+                        "Test B.v."
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/organization/isp",
                     "data_type": "string",
                     "example_values": [
-                        "Test S.A.",
-                        "Test Mobile Place"
+                        "Test S.A."
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/organization/org",
                     "data_type": "string",
                     "example_values": [
-                        "Test S.A.",
-                        "Test Mobile"
+                        "Test S.A."
                     ]
                 },
                 {
@@ -3427,6 +3541,161 @@
                     "data_type": "string",
                     "example_values": [
                         "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/actionType",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS_API_CALL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/api",
+                    "data_type": "string",
+                    "example_values": [
+                        "GetLayout"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/callerType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Remote IP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/city/cityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mumbai"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/country/countryName",
+                    "data_type": "string",
+                    "example_values": [
+                        "India"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lat",
+                    "data_type": "string",
+                    "example_values": [
+                        "19.0748"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lon",
+                    "data_type": "string",
+                    "example_values": [
+                        "72.8856"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "136.226.232.247"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "53813"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/asnOrg",
+                    "data_type": "string",
+                    "example_values": [
+                        "ZSCALER-INC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/isp",
+                    "data_type": "string",
+                    "example_values": [
+                        "Zscaler"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/org",
+                    "data_type": "string",
+                    "example_values": [
+                        "Zscaler"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/serviceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "cloudshell.amazonaws.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/type",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/archived",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/count",
+                    "data_type": "string",
+                    "example_values": [
+                        "1584"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/detectorId",
+                    "data_type": "string",
+                    "example_values": [
+                        "c8b6836865362e2b73f679f650bdaf16"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/eventFirstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2023-04-24T17:06:01.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/eventLastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2023-04-27T05:22:52.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/resourceRole",
+                    "data_type": "string",
+                    "example_values": [
+                        "TARGET"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/serviceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "guardduty"
                     ]
                 },
                 {
@@ -3471,7 +3740,6 @@
                     "data_path": "action_result.data.*.ProductFields.count",
                     "data_type": "string",
                     "example_values": [
-                        "92",
                         "159"
                     ]
                 },
@@ -3493,11 +3761,25 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.ProductName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Security Hub"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.RecordState",
                     "data_type": "string",
                     "example_values": [
                         "ARCHIVED",
                         "ACTIVE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Region",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-east-1"
                     ]
                 },
                 {
@@ -3558,6 +3840,27 @@
                     "data_type": "string",
                     "example_values": [
                         "vpc-513464894"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsIamAccessKey.PrincipalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "157568067690"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsIamAccessKey.PrincipalName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Root"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsIamAccessKey.PrincipalType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Root"
                     ]
                 },
                 {
@@ -3633,6 +3936,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Sample",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.SchemaVersion",
                     "data_type": "string",
                     "example_values": [
@@ -3668,6 +3979,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.SourceUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://us-east-1.console.aws.amazon.com/guardduty/home?region=us-east-1#/findings?macros=current&fId=32c3da20b4a8e7cc262e2b21a35f5c04"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Title",
                     "data_type": "string",
                     "example_values": [
@@ -3685,7 +4003,6 @@
                     "data_path": "action_result.data.*.UpdatedAt",
                     "data_type": "string",
                     "example_values": [
-                        "2019-04-11T06:01:08.185Z",
                         "2019-04-11T22:35:03.677Z"
                     ]
                 },
@@ -3704,21 +4021,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Total findings: 1"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.total_findings",
                     "data_type": "numeric",
                     "example_values": [
@@ -3733,6 +4035,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total findings: 1"
+                    ]
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -3744,16 +4053,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.credentials",
-                    "data_type": "string",
-                    "example_values": [
-                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
-                    ],
-                    "contains": [
-                        "aws credentials"
                     ]
                 }
             ],
@@ -3807,6 +4106,24 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
@@ -3834,6 +4151,41 @@
                     "example_values": [
                         true,
                         false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-allow-headers",
+                    "data_type": "string",
+                    "example_values": [
+                        "Authorization,Date,X-Amz-Date,X-Amz-Security-Token,X-Amz-Target,content-type,x-amz-content-sha256,x-amz-user-agent,x-amzn-platform-id,x-amzn-trace-id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-allow-methods",
+                    "data_type": "string",
+                    "example_values": [
+                        "GET,POST,OPTIONS,PUT,PATCH,DELETE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-allow-origin",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-expose-headers",
+                    "data_type": "string",
+                    "example_values": [
+                        "x-amzn-errortype,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-max-age",
+                    "data_type": "string",
+                    "example_values": [
+                        "86400"
                     ]
                 },
                 {
@@ -3907,21 +4259,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Archive note: Added successfully, Archived status: Successful"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.archive_note",
                     "data_type": "string",
                     "example_values": [
@@ -3943,6 +4280,13 @@
                     "column_order": 2
                 },
                 {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive note: Added successfully, Archived status: Successful"
+                    ]
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -3954,16 +4298,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.credentials",
-                    "data_type": "string",
-                    "example_values": [
-                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
-                    ],
-                    "contains": [
-                        "aws credentials"
                     ]
                 }
             ],
@@ -4014,6 +4348,24 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
@@ -4041,6 +4393,41 @@
                     "example_values": [
                         true,
                         false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-allow-headers",
+                    "data_type": "string",
+                    "example_values": [
+                        "Authorization,Date,X-Amz-Date,X-Amz-Security-Token,X-Amz-Target,content-type,x-amz-content-sha256,x-amz-user-agent,x-amzn-platform-id,x-amzn-trace-id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-allow-methods",
+                    "data_type": "string",
+                    "example_values": [
+                        "GET,POST,OPTIONS,PUT,PATCH,DELETE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-allow-origin",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-expose-headers",
+                    "data_type": "string",
+                    "example_values": [
+                        "x-amzn-errortype,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-max-age",
+                    "data_type": "string",
+                    "example_values": [
+                        "86400"
                     ]
                 },
                 {
@@ -4114,21 +4501,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Unarchive note: Added successfully, Unarchived status: Successful"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.unarchive_note",
                     "data_type": "string",
                     "example_values": [
@@ -4150,6 +4522,13 @@
                     "column_order": 2
                 },
                 {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unarchive note: Added successfully, Unarchived status: Successful"
+                    ]
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -4161,16 +4540,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.credentials",
-                    "data_type": "string",
-                    "example_values": [
-                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
-                    ],
-                    "contains": [
-                        "aws credentials"
                     ]
                 }
             ],
@@ -4221,6 +4590,26 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
@@ -4248,6 +4637,41 @@
                     "example_values": [
                         true,
                         false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-allow-headers",
+                    "data_type": "string",
+                    "example_values": [
+                        "Authorization,Date,X-Amz-Date,X-Amz-Security-Token,X-Amz-Target,content-type,x-amz-content-sha256,x-amz-user-agent,x-amzn-platform-id,x-amzn-trace-id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-allow-methods",
+                    "data_type": "string",
+                    "example_values": [
+                        "GET,POST,OPTIONS,PUT,PATCH,DELETE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-allow-origin",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-expose-headers",
+                    "data_type": "string",
+                    "example_values": [
+                        "x-amzn-errortype,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amz-apigw-id,date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.access-control-max-age",
+                    "data_type": "string",
+                    "example_values": [
+                        "86400"
                     ]
                 },
                 {
@@ -4321,27 +4745,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary.add_note",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 2
+                        "Success"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Note added successfully to the provided findings ID"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.add_note",
-                    "data_type": "string",
-                    "example_values": [
-                        "Success"
                     ]
                 },
                 {
@@ -4357,16 +4771,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.credentials",
-                    "data_type": "string",
-                    "example_values": [
-                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
-                    ],
-                    "contains": [
-                        "aws credentials"
-                    ]
                 }
             ],
             "versions": "EQ(*)",
@@ -4375,5 +4779,53 @@
                 "type": "table"
             }
         }
-    ]
+    ],
+    "pip39_dependencies": {
+        "wheel": [
+            {
+                "module": "boto3",
+                "input_file": "wheels/py3/boto3-1.26.103-py3-none-any.whl"
+            },
+            {
+                "module": "botocore",
+                "input_file": "wheels/py3/botocore-1.29.103-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/py3/certifi-2022.12.7-py3-none-any.whl"
+            },
+            {
+                "module": "charset_normalizer",
+                "input_file": "wheels/py39/charset_normalizer-3.1.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/py3/idna-3.4-py3-none-any.whl"
+            },
+            {
+                "module": "jmespath",
+                "input_file": "wheels/py3/jmespath-1.0.1-py3-none-any.whl"
+            },
+            {
+                "module": "python_dateutil",
+                "input_file": "wheels/shared/python_dateutil-2.8.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/py3/requests-2.28.2-py3-none-any.whl"
+            },
+            {
+                "module": "s3transfer",
+                "input_file": "wheels/py3/s3transfer-0.6.0-py3-none-any.whl"
+            },
+            {
+                "module": "six",
+                "input_file": "wheels/shared/six-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/shared/urllib3-1.26.15-py2.py3-none-any.whl"
+            }
+        ]
+    }
 }
