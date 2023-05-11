@@ -1,3 +1,1 @@
 **Unreleased**
-* Updated boto3 library
-* Added support for 14 more AWS Regions
