@@ -2,7 +2,7 @@
 # AWS Security Hub
 
 Publisher: Splunk  
-Connector Version: 2.4.0  
+Connector Version: 2.4.1  
 Product Vendor: AWS  
 Product Name: Security Hub  
 Product Version Supported (regex): ".\*"  
