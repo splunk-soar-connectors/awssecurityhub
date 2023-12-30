@@ -38,11 +38,6 @@ Copyright 2015 - dateutil contributors (see AUTHORS file)
 Copyright 2017 Paul Ganssle <paul@ganssle.io>
 Copyright 2017 dateutil contributors (see AUTHORS file)
 
-Library: requests
-Version: 2.25.0
-License: Apache 2.0
-Kenneth Reitz
-
 Library: s3transfer
 Version: 0.3.4
 License: Apache 2.0

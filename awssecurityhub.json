@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2023 Splunk Inc.",
-    "app_version": "2.4.0",
+    "app_version": "2.4.1",
     "utctime_updated": "2022-01-31T20:18:33.000000Z",
     "package_name": "phantom_awssecurityhub",
     "main_module": "awssecurityhub_connector.py",
@@ -4788,19 +4788,7 @@
             },
             {
                 "module": "botocore",
-                "input_file": "wheels/py3/botocore-1.29.103-py3-none-any.whl"
-            },
-            {
-                "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.12.7-py3-none-any.whl"
-            },
-            {
-                "module": "charset_normalizer",
-                "input_file": "wheels/py39/charset_normalizer-3.1.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-                "module": "idna",
-                "input_file": "wheels/py3/idna-3.4-py3-none-any.whl"
+                "input_file": "wheels/py3/botocore-1.29.165-py3-none-any.whl"
             },
             {
                 "module": "jmespath",
@@ -4811,12 +4799,8 @@
                 "input_file": "wheels/shared/python_dateutil-2.8.2-py2.py3-none-any.whl"
             },
             {
-                "module": "requests",
-                "input_file": "wheels/py3/requests-2.28.2-py3-none-any.whl"
-            },
-            {
                 "module": "s3transfer",
-                "input_file": "wheels/py3/s3transfer-0.6.0-py3-none-any.whl"
+                "input_file": "wheels/py3/s3transfer-0.6.1-py3-none-any.whl"
             },
             {
                 "module": "six",
@@ -4824,7 +4808,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.15-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.16-py2.py3-none-any.whl"
             }
         ]
     }
