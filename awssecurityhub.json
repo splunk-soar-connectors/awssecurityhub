@@ -4796,11 +4796,11 @@
             },
             {
                 "module": "python_dateutil",
-                "input_file": "wheels/shared/python_dateutil-2.8.2-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/python_dateutil-2.9.0.post0-py2.py3-none-any.whl"
             },
             {
                 "module": "s3transfer",
-                "input_file": "wheels/py3/s3transfer-0.6.1-py3-none-any.whl"
+                "input_file": "wheels/py3/s3transfer-0.6.2-py3-none-any.whl"
             },
             {
                 "module": "six",
@@ -4808,7 +4808,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.16-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.18-py2.py3-none-any.whl"
             }
         ]
     }
