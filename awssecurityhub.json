@@ -9,7 +9,7 @@
     "product_name": "Security Hub",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-20245 Splunk Inc.",
+    "license": "Copyright (c) 2019-2024 Splunk Inc.",
     "app_version": "2.4.1",
     "utctime_updated": "2022-01-31T20:18:33.000000Z",
     "package_name": "phantom_awssecurityhub",
