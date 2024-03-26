@@ -9,8 +9,8 @@
     "product_name": "Security Hub",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2023 Splunk Inc.",
-    "app_version": "2.4.1",
+    "license": "Copyright (c) 2019-2024 Splunk Inc.",
+    "app_version": "2.4.3",
     "utctime_updated": "2022-01-31T20:18:33.000000Z",
     "package_name": "phantom_awssecurityhub",
     "main_module": "awssecurityhub_connector.py",
@@ -66,10 +66,6 @@
             {
                 "module": "six",
                 "input_file": "wheels/six-1.15.0-py2.py3-none-any.whl"
-            },
-            {
-                "module": "urllib3",
-                "input_file": "wheels/urllib3-1.26.6-py2.py3-none-any.whl"
             }
         ]
     },
@@ -4796,19 +4792,15 @@
             },
             {
                 "module": "python_dateutil",
-                "input_file": "wheels/shared/python_dateutil-2.8.2-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/python_dateutil-2.9.0.post0-py2.py3-none-any.whl"
             },
             {
                 "module": "s3transfer",
-                "input_file": "wheels/py3/s3transfer-0.6.1-py3-none-any.whl"
+                "input_file": "wheels/py3/s3transfer-0.6.2-py3-none-any.whl"
             },
             {
                 "module": "six",
                 "input_file": "wheels/shared/six-1.16.0-py2.py3-none-any.whl"
-            },
-            {
-                "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.16-py2.py3-none-any.whl"
             }
         ]
     }
