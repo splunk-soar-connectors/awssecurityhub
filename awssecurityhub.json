@@ -14,7 +14,7 @@
     "utctime_updated": "2022-01-31T20:18:33.000000Z",
     "package_name": "phantom_awssecurityhub",
     "main_module": "awssecurityhub_connector.py",
-    "min_phantom_version": "6.1.1",
+    "min_phantom_version": "5.5.0",
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
