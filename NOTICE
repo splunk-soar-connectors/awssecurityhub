@@ -1,5 +1,5 @@
 Splunk SOAR AWS Security Hub
-Copyright (c) 2019-2022 Splunk Inc.
+Copyright (c) 2019-2024 Splunk Inc.
 
 Third-party Software Attributions:
 
@@ -15,11 +15,6 @@ Copyright 2008-2011 Andrey Petrov and contributors
 Copyright 2012 Kenneth Reitz
 Copyright 2012-2017 Amazon.com, Inc
 Copyright 2013 Kenneth Reitz
-
-Library: docutils
-Version: 0.16
-License: Public Domain
-Copyright 2011 Günter Milde,
 
 Library: jmespath
 Version: 0.10.0
@@ -47,8 +42,3 @@ Library: six
 Version: 1.15.0
 License: MIT
 Copyright 2010-2020 Benjamin Peterson
-
-Library: urllib3
-Version: 1.26.6
-License: MIT
-Copyright 2008-2020 Andrey Petrov and contributors
