@@ -1,6 +1,6 @@
 # File: awssecurityhub_consts.py
 #
-# Copyright (c) 2019-2024 Splunk Inc.
+# Copyright (c) 2019-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,20 +50,16 @@ AWSSECURITYHUB_REGION_DICT = {
 }
 
 AWSSECURITYHUB_FINDING_CEF_TYPES = {
-        "Id": ["aws security hub findings id", "aws arn"],
-        "ProductArn": ["aws arn"],
-        "GeneratorId": ["aws arn"],
-        "ProductFields.aws/securityhub/FindingId": ["aws arn"],
-        "ProductFields.action/networkConnectionAction/localPortDetails/port": ["port"],
-        "ProductFields.action/networkConnectionAction/remotePortDetails/port": ["port"],
-        "ProductFields.action/networkConnectionAction/remoteIpDetails/ipAddressV4": ["ip"]
+    "Id": ["aws security hub findings id", "aws arn"],
+    "ProductArn": ["aws arn"],
+    "GeneratorId": ["aws arn"],
+    "ProductFields.aws/securityhub/FindingId": ["aws arn"],
+    "ProductFields.action/networkConnectionAction/localPortDetails/port": ["port"],
+    "ProductFields.action/networkConnectionAction/remotePortDetails/port": ["port"],
+    "ProductFields.action/networkConnectionAction/remoteIpDetails/ipAddressV4": ["ip"],
 }
 
-AWSSECURITYHUB_RESOURCE_CEF_TYPES = {
-        "Id": ["aws arn"],
-        "InstanceId": ["aws ec2 instance id"],
-        "Details.AwsEc2Instance.IpV4Addresses": ["ip"]
-}
+AWSSECURITYHUB_RESOURCE_CEF_TYPES = {"Id": ["aws arn"], "InstanceId": ["aws ec2 instance id"], "Details.AwsEc2Instance.IpV4Addresses": ["ip"]}
 
 AWSSECURITYHUB_ERROR_TEST_CONNECTIVITY = "Test Connectivity Failed"
 AWSSECURITYHUB_SUCC_TEST_CONNECTIVITY = "Test Connectivity Passed"
