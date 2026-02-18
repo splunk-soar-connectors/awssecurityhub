@@ -9,13 +9,13 @@
     "product_name": "Security Hub",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2024 Splunk Inc.",
+    "license": "Copyright (c) 2019-2025 Splunk Inc.",
     "app_version": "2.4.2",
     "utctime_updated": "2022-01-31T20:18:33.000000Z",
     "package_name": "phantom_awssecurityhub",
     "main_module": "awssecurityhub_connector.py",
     "min_phantom_version": "5.5.0",
-    "python_version": "3",
+    "python_version": "3.9, 3.13",
     "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud API, May 7, 2023"
@@ -4764,27 +4764,39 @@
         "wheel": [
             {
                 "module": "boto3",
-                "input_file": "wheels/py3/boto3-1.26.103-py3-none-any.whl"
+                "input_file": "wheels/py3/boto3-1.40.10-py3-none-any.whl"
             },
             {
                 "module": "botocore",
-                "input_file": "wheels/py3/botocore-1.29.165-py3-none-any.whl"
+                "input_file": "wheels/py3/botocore-1.40.11-py3-none-any.whl"
             },
             {
                 "module": "jmespath",
                 "input_file": "wheels/py3/jmespath-1.0.1-py3-none-any.whl"
             },
             {
-                "module": "python_dateutil",
-                "input_file": "wheels/shared/python_dateutil-2.9.0.post0-py2.py3-none-any.whl"
+                "module": "s3transfer",
+                "input_file": "wheels/py3/s3transfer-0.13.1-py3-none-any.whl"
+            }
+        ]
+    },
+    "pip313_dependencies": {
+        "wheel": [
+            {
+                "module": "boto3",
+                "input_file": "wheels/py3/boto3-1.40.10-py3-none-any.whl"
+            },
+            {
+                "module": "botocore",
+                "input_file": "wheels/py3/botocore-1.40.11-py3-none-any.whl"
+            },
+            {
+                "module": "jmespath",
+                "input_file": "wheels/py3/jmespath-1.0.1-py3-none-any.whl"
             },
             {
                 "module": "s3transfer",
-                "input_file": "wheels/py3/s3transfer-0.6.2-py3-none-any.whl"
-            },
-            {
-                "module": "six",
-                "input_file": "wheels/shared/six-1.16.0-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/s3transfer-0.13.1-py3-none-any.whl"
             }
         ]
     }
