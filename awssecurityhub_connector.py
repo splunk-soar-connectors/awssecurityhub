@@ -1,6 +1,6 @@
 # File: awssecurityhub_connector.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -451,7 +451,9 @@ class AwsSecurityHubConnector(BaseConnector):
                     break
                 continue
 
-            successful_finding_ids.add(finding.get("Id"))
+            finding_id = finding.get("Id")
+            if finding_id:
+                successful_finding_ids.add(finding_id)
             last_successful_updated_at = finding.get("UpdatedAt") or last_successful_updated_at
 
         if polling_sqs:
