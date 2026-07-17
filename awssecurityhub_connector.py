@@ -576,8 +576,15 @@ class AwsSecurityHubConnector(BaseConnector):
     def _paginator(self, method_name, filters, limit, action_result):
         list_items = list()
         next_token = None
+        seen_tokens = set()
+        page_count = 0
 
         while True:
+            page_count += 1
+            if page_count > AWSSECURITYHUB_MAX_PAGINATION_PAGES:
+                action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_PAGINATION_LIMIT_EXCEEDED)
+                return None
+
             if next_token:
                 ret_val, response = self._make_boto_call(
                     action_result, method_name, Filters=filters, NextToken=next_token, MaxResults=AWSSECURITYHUB_MAX_PER_PAGE_LIMIT
@@ -599,6 +606,15 @@ class AwsSecurityHubConnector(BaseConnector):
             next_token = response.get("NextToken")
             if not next_token:
                 break
+
+            if len(list_items) >= AWSSECURITYHUB_MAX_PAGINATION_ITEMS:
+                action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_PAGINATION_LIMIT_EXCEEDED)
+                return None
+
+            if next_token in seen_tokens:
+                action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_PAGINATION_TOKEN_REPEATED)
+                return None
+            seen_tokens.add(next_token)
 
         return list_items
 
