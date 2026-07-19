@@ -11,7 +11,7 @@
 {% block widget_content %}
   <!-- Main Start Block -->
   <!-- File: awssecurityhub_get_findings.html
-  Copyright (c) 2019-2025 Splunk Inc.
+  Copyright (c) 2019-2026 Splunk Inc.
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
@@ -87,7 +87,7 @@
                 <td>Resource ID</td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['aws security hub resource id'], 'value':'{{ result.param.resource_id }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['aws security hub resource id'], 'value':'{{ result.param.resource_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ result.param.resource_id }}
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -100,7 +100,7 @@
                 <td>Resource EC2 IPv4 Addresses</td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['aws security hub resource ip'], 'value':'{{ result.param.resource_ec2_ipv4_addresses }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['aws security hub resource ip'], 'value':'{{ result.param.resource_ec2_ipv4_addresses|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ result.param.resource_ec2_ipv4_addresses }}
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -113,7 +113,7 @@
                 <td>Network Source IPv4</td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['aws security hub network source ip'], 'value':'{{ result.param.network_source_ipv4 }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['aws security hub network source ip'], 'value':'{{ result.param.network_source_ipv4|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ result.param.network_source_ipv4 }}
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -126,7 +126,7 @@
                 <td>Network Source MAC</td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['mac address'], 'value':'{{ result.param.network_source_mac }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['mac address'], 'value':'{{ result.param.network_source_mac|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ result.param.network_source_mac }}
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -139,7 +139,7 @@
                 <td>Resource Region</td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['aws security hub resource region'], 'value':'{{ result.param.resource_region }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['aws security hub resource region'], 'value':'{{ result.param.resource_region|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ result.param.resource_region }}
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -152,7 +152,7 @@
                 <td>Findings ID</td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['aws security hub findings id'], 'value':'{{ result.param.findings_id }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['aws security hub findings id'], 'value':'{{ result.param.findings_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ result.param.findings_id }}
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -194,7 +194,7 @@
                 <td>Findings ID</td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['aws security hub findings id'], 'value':'{{ data.Id }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['aws security hub findings id'], 'value':'{{ data.Id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ data.Id }}
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -229,7 +229,7 @@
                   {% for resource in data.Resources %}
                     <td class="widget-td">
                       <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['aws security hub resource region'], 'value':'{{ resource.Region }}' }], 0, {{ container.id }}, null, false);">
+                         onclick="context_menu(this, [{'contains': ['aws security hub resource region'], 'value':'{{ resource.Region|escapejs }}' }], 0, {{ container.id }}, null, false);">
                         {{ resource.Region }}
                         &nbsp;
                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -239,7 +239,7 @@
                       {% for ip in resource.Details.AwsEc2Instance.IpV4Addresses %}
                         <span class="glyphicon glyphicon-dot"></span>&nbsp;
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['aws security hub resource ip', 'ip'], 'value': '{{ ip }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['aws security hub resource ip', 'ip'], 'value': '{{ ip|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ ip }}
                           &nbsp;
                           <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -249,7 +249,7 @@
                     </td>
                     <td class="widget-td">
                       <a href="javascript:;"
-                         onclick="context_menu(this, [{'contains': ['aws security hub resource id'], 'value':'{{ resource.Id }}' }], 0, {{ container.id }}, null, false);">
+                         onclick="context_menu(this, [{'contains': ['aws security hub resource id'], 'value':'{{ resource.Id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                         {{ resource.Id }}
                         &nbsp;
                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>

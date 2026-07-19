@@ -1,6 +1,6 @@
 # File: awssecurityhub_consts.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -88,6 +88,10 @@ AWSSECURITYHUB_POLL_NOW_DAYS_KEY = "'poll_now_days' configuration parameter"
 AWSSECURITYHUB_SCHEDULED_POLL_DAYS_KEY = "'scheduled_poll_days' configuration parameter"
 
 AWSSECURITYHUB_DEFAULT_REQUEST_TIMEOUT = 30  # in seconds
+AWSSECURITYHUB_MAX_PAGINATION_ITEMS = 100000
+AWSSECURITYHUB_MAX_PAGINATION_PAGES = 1000
+AWSSECURITYHUB_PAGINATION_LIMIT_EXCEEDED = "Pagination exceeded the connector safety limit"
+AWSSECURITYHUB_PAGINATION_TOKEN_REPEATED = "Pagination token did not advance"
 
 # constants relating to 'initialize'
 AWSSECURITYHUB_STATE_FILE_CORRUPT_ERROR = (

@@ -1,6 +1,6 @@
 # File: awssecurityhub_connector.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import ast
 import ipaddress
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import phantom.app as phantom
 import requests
@@ -314,6 +314,7 @@ class AwsSecurityHubConnector(BaseConnector):
         self.debug_print(f"Max containers to poll for: {max_containers}")
 
         findings = []
+        message_records = []
         while len(findings) < max_containers:
             ret_val, resp_json = self._make_boto_call(
                 action_result, "receive_message", QueueUrl=url, MaxNumberOfMessages=AWSSECURITYHUB_SQS_MESSAGE_LIMIT
@@ -323,7 +324,7 @@ class AwsSecurityHubConnector(BaseConnector):
                 return None
 
             if "Messages" not in resp_json:
-                return findings
+                return findings, message_records
 
             for message in resp_json["Messages"]:
                 try:
@@ -335,25 +336,35 @@ class AwsSecurityHubConnector(BaseConnector):
                     continue
 
                 if message_dict and message_dict.get("detail", {}).get("findings", []):
-                    findings.extend(json.loads(message["Body"])["detail"]["findings"])
+                    message_findings = message_dict["detail"]["findings"]
                 else:
                     self.debug_print(f"Skipping the following sqs message because of failure to extract finding object: {message_dict}")
                     continue
 
-                ret_val, resp_json = self._make_boto_call(action_result, "delete_message", QueueUrl=url, ReceiptHandle=message["ReceiptHandle"])
+                remaining = max_containers - len(findings)
+                selected_findings = message_findings[:remaining]
+                findings.extend(selected_findings)
+                message_records.append(
+                    {
+                        "receipt_handle": message["ReceiptHandle"],
+                        "finding_ids": [finding.get("Id") for finding in selected_findings],
+                        "complete": len(selected_findings) == len(message_findings),
+                    }
+                )
 
-                if phantom.is_fail(ret_val):
-                    self.debug_print("Could not delete message from SQS after receipt. This message may be received again in the future.")
+                if len(findings) >= max_containers:
+                    break
 
             self.send_progress(f"Received {min(len(findings), max_containers)} messages")
 
-        return findings[:max_containers]
+        return findings, message_records
 
     def _poll_from_security_hub(self, action_result, max_containers, param):
         if phantom.is_fail(self._create_client(action_result, "securityhub", param)):
             return None
 
-        end_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        end_date = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        self._poll_window_end = end_date
         if self.is_poll_now():
             days = self._poll_now_days
             filters = {"UpdatedAt": [{"DateRange": {"Value": days, "Unit": "DAYS"}}]}
@@ -363,18 +374,13 @@ class AwsSecurityHubConnector(BaseConnector):
         else:
             start_date = self._state.get("last_ingested_date")
             if not start_date:
-                start_date = end_date - timedelta(days=self._scheduled_poll_days)
+                start_date = (datetime.now(timezone.utc) - timedelta(days=self._scheduled_poll_days)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             filters = {"UpdatedAt": [{"Start": start_date, "End": end_date}]}
 
         findings = self._paginator("get_findings", filters, max_containers, action_result)
 
         if findings is None:
             return None
-
-        if not self.is_poll_now():
-            self._state["last_ingested_date"] = end_date
-            if self._state.get("first_run", True):
-                self._state["first_run"] = False
 
         return findings
 
@@ -391,8 +397,14 @@ class AwsSecurityHubConnector(BaseConnector):
         config = self.get_config()
         container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
 
-        if "sqs_url" in config:
-            findings = self._poll_from_sqs(action_result, config["sqs_url"], container_count, param)
+        sqs_message_records = []
+        polling_sqs = bool(config.get("sqs_url"))
+        if polling_sqs:
+            poll_result = self._poll_from_sqs(action_result, config["sqs_url"], container_count, param)
+            if poll_result is None:
+                findings = None
+            else:
+                findings, sqs_message_records = poll_result
         else:
             findings = self._poll_from_security_hub(action_result, container_count, param)
 
@@ -404,18 +416,69 @@ class AwsSecurityHubConnector(BaseConnector):
         else:
             self.save_progress("No findings found")
 
-        for finding in findings:
-            container_id = self._create_container(finding)
+        if not polling_sqs:
+            findings.sort(key=lambda finding: finding.get("UpdatedAt", ""))
 
-            # If there is any error during creation of finding, skip that finding
+        successful_finding_ids = set()
+        last_successful_updated_at = None
+        ingestion_failed = False
+
+        for finding in findings:
+            try:
+                container_id = self._create_container(finding)
+            except Exception as exc:
+                self.debug_print(f"Error while creating container for finding {finding.get('Id', 'unknown')}: {exc}")
+                container_id = None
+
             if not container_id:
+                ingestion_failed = True
+                if not polling_sqs:
+                    break
                 continue
 
             # Create artifacts for specific finding
-            artifacts_creation_status, artifacts_creation_message = self._create_artifacts(finding=finding, container_id=container_id)
+            try:
+                artifacts_creation_status, artifacts_creation_message = self._create_artifacts(finding=finding, container_id=container_id)
+            except Exception as exc:
+                self.debug_print(f"Error while creating artifacts for finding {finding.get('Id', 'unknown')}: {exc}")
+                artifacts_creation_status = phantom.APP_ERROR
+                artifacts_creation_message = str(exc)
 
             if phantom.is_fail(artifacts_creation_status):
                 self.debug_print(f"Error while creating artifacts for container with ID {container_id}. {artifacts_creation_message}")
+                ingestion_failed = True
+                if not polling_sqs:
+                    break
+                continue
+
+            finding_id = finding.get("Id")
+            if finding_id:
+                successful_finding_ids.add(finding_id)
+            last_successful_updated_at = finding.get("UpdatedAt") or last_successful_updated_at
+
+        if polling_sqs:
+            for message_record in sqs_message_records:
+                finding_ids = set(message_record["finding_ids"])
+                if message_record["complete"] and finding_ids and finding_ids.issubset(successful_finding_ids):
+                    ret_val, _ = self._make_boto_call(
+                        action_result,
+                        "delete_message",
+                        QueueUrl=config["sqs_url"],
+                        ReceiptHandle=message_record["receipt_handle"],
+                    )
+                    if phantom.is_fail(ret_val):
+                        ingestion_failed = True
+                        self.debug_print("Could not delete a fully ingested SQS message; it will be retried.")
+        elif not self.is_poll_now():
+            if last_successful_updated_at:
+                self._state["last_ingested_date"] = last_successful_updated_at
+                self._state["first_run"] = False
+            elif not findings and not ingestion_failed:
+                self._state["last_ingested_date"] = self._poll_window_end
+                self._state["first_run"] = False
+
+        if ingestion_failed:
+            return action_result.set_status(phantom.APP_ERROR, "One or more findings were not durably ingested and will be retried")
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -515,8 +578,15 @@ class AwsSecurityHubConnector(BaseConnector):
     def _paginator(self, method_name, filters, limit, action_result):
         list_items = list()
         next_token = None
+        seen_tokens = set()
+        page_count = 0
 
         while True:
+            page_count += 1
+            if page_count > AWSSECURITYHUB_MAX_PAGINATION_PAGES:
+                action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_PAGINATION_LIMIT_EXCEEDED)
+                return None
+
             if next_token:
                 ret_val, response = self._make_boto_call(
                     action_result, method_name, Filters=filters, NextToken=next_token, MaxResults=AWSSECURITYHUB_MAX_PER_PAGE_LIMIT
@@ -538,6 +608,15 @@ class AwsSecurityHubConnector(BaseConnector):
             next_token = response.get("NextToken")
             if not next_token:
                 break
+
+            if len(list_items) >= AWSSECURITYHUB_MAX_PAGINATION_ITEMS:
+                action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_PAGINATION_LIMIT_EXCEEDED)
+                return None
+
+            if next_token in seen_tokens:
+                action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_PAGINATION_TOKEN_REPEATED)
+                return None
+            seen_tokens.add(next_token)
 
         return list_items
 
