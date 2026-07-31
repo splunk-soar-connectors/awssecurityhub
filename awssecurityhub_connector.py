@@ -359,22 +359,51 @@ class AwsSecurityHubConnector(BaseConnector):
 
         return findings, message_records
 
-    def _poll_from_security_hub(self, action_result, max_containers, param):
+    def _get_scheduled_poll_start(self, now):
+        fallback_start = now - timedelta(days=self._scheduled_poll_days)
+        if self._state.get("first_run", True):
+            initial_start = self._state.get("initial_poll_start")
+            if initial_start:
+                return initial_start
+            initial_start = fallback_start.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            self._state["initial_poll_start"] = initial_start
+            return initial_start
+
+        if self._state.get("checkpoint_version") != 2:
+            migrated_start = fallback_start.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            self._state["last_ingested_date"] = migrated_start
+            self._state["checkpoint_version"] = 2
+            return migrated_start
+
+        last_ingested_date = self._state.get("last_ingested_date")
+        if not last_ingested_date:
+            return fallback_start.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+        try:
+            parsed_checkpoint = datetime.fromisoformat(last_ingested_date.replace("Z", "+00:00"))
+            if parsed_checkpoint.tzinfo is None:
+                raise ValueError("checkpoint lacks a timezone")
+            if parsed_checkpoint > now:
+                raise ValueError("checkpoint is in the future")
+        except (AttributeError, TypeError, ValueError):
+            migrated_start = fallback_start.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            self._state["last_ingested_date"] = migrated_start
+            return migrated_start
+
+        return last_ingested_date
+
+    def _poll_from_security_hub(self, action_result, max_containers, param, poll_now):
         if phantom.is_fail(self._create_client(action_result, "securityhub", param)):
             return None
 
-        end_date = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        now = datetime.now(timezone.utc)
+        end_date = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         self._poll_window_end = end_date
-        if self.is_poll_now():
+        if poll_now:
             days = self._poll_now_days
             filters = {"UpdatedAt": [{"DateRange": {"Value": days, "Unit": "DAYS"}}]}
-        elif self._state.get("first_run", True):
-            days = self._scheduled_poll_days
-            filters = {"UpdatedAt": [{"DateRange": {"Value": days, "Unit": "DAYS"}}]}
         else:
-            start_date = self._state.get("last_ingested_date")
-            if not start_date:
-                start_date = (datetime.now(timezone.utc) - timedelta(days=self._scheduled_poll_days)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            start_date = self._get_scheduled_poll_start(now)
             filters = {"UpdatedAt": [{"Start": start_date, "End": end_date}]}
 
         findings = self._paginator("get_findings", filters, max_containers, action_result)
@@ -396,6 +425,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         config = self.get_config()
         container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
+        poll_now = self.is_poll_now()
 
         sqs_message_records = []
         polling_sqs = bool(config.get("sqs_url"))
@@ -406,7 +436,7 @@ class AwsSecurityHubConnector(BaseConnector):
             else:
                 findings, sqs_message_records = poll_result
         else:
-            findings = self._poll_from_security_hub(action_result, container_count, param)
+            findings = self._poll_from_security_hub(action_result, container_count, param, poll_now)
 
         if findings:
             self.save_progress("Ingesting data")
@@ -469,13 +499,17 @@ class AwsSecurityHubConnector(BaseConnector):
                     if phantom.is_fail(ret_val):
                         ingestion_failed = True
                         self.debug_print("Could not delete a fully ingested SQS message; it will be retried.")
-        elif not self.is_poll_now():
+        elif not poll_now:
             if last_successful_updated_at:
                 self._state["last_ingested_date"] = last_successful_updated_at
                 self._state["first_run"] = False
+                self._state["checkpoint_version"] = 2
+                self._state.pop("initial_poll_start", None)
             elif not findings and not ingestion_failed:
                 self._state["last_ingested_date"] = self._poll_window_end
                 self._state["first_run"] = False
+                self._state["checkpoint_version"] = 2
+                self._state.pop("initial_poll_start", None)
 
         if ingestion_failed:
             return action_result.set_status(phantom.APP_ERROR, "One or more findings were not durably ingested and will be retried")
