@@ -315,6 +315,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         findings = []
         message_records = []
+        message_progress = self._state.setdefault("sqs_message_progress", {})
         while len(findings) < max_containers:
             ret_val, resp_json = self._make_boto_call(
                 action_result, "receive_message", QueueUrl=url, MaxNumberOfMessages=AWSSECURITYHUB_SQS_MESSAGE_LIMIT
@@ -341,14 +342,23 @@ class AwsSecurityHubConnector(BaseConnector):
                     self.debug_print(f"Skipping the following sqs message because of failure to extract finding object: {message_dict}")
                     continue
 
+                message_id = message.get("MessageId")
+                all_finding_ids = [finding.get("Id") for finding in message_findings]
+                if not message_id or any(not finding_id for finding_id in all_finding_ids):
+                    self.debug_print("Skipping an SQS message that lacks stable message or finding identifiers")
+                    continue
+
+                completed_finding_ids = set(message_progress.get(message_id, []))
+                pending_findings = [finding for finding in message_findings if finding["Id"] not in completed_finding_ids]
                 remaining = max_containers - len(findings)
-                selected_findings = message_findings[:remaining]
+                selected_findings = pending_findings[:remaining]
                 findings.extend(selected_findings)
                 message_records.append(
                     {
+                        "message_id": message_id,
                         "receipt_handle": message["ReceiptHandle"],
-                        "finding_ids": [finding.get("Id") for finding in selected_findings],
-                        "complete": len(selected_findings) == len(message_findings),
+                        "all_finding_ids": all_finding_ids,
+                        "selected_finding_ids": [finding["Id"] for finding in selected_findings],
                     }
                 )
 
@@ -487,9 +497,16 @@ class AwsSecurityHubConnector(BaseConnector):
             last_successful_updated_at = finding.get("UpdatedAt") or last_successful_updated_at
 
         if polling_sqs:
+            message_progress = self._state.setdefault("sqs_message_progress", {})
             for message_record in sqs_message_records:
-                finding_ids = set(message_record["finding_ids"])
-                if message_record["complete"] and finding_ids and finding_ids.issubset(successful_finding_ids):
+                message_id = message_record["message_id"]
+                completed_finding_ids = set(message_progress.get(message_id, []))
+                completed_finding_ids.update(set(message_record["selected_finding_ids"]) & successful_finding_ids)
+                if completed_finding_ids:
+                    message_progress[message_id] = sorted(completed_finding_ids)
+
+                all_finding_ids = set(message_record["all_finding_ids"])
+                if all_finding_ids and all_finding_ids.issubset(completed_finding_ids):
                     ret_val, _ = self._make_boto_call(
                         action_result,
                         "delete_message",
@@ -499,6 +516,8 @@ class AwsSecurityHubConnector(BaseConnector):
                     if phantom.is_fail(ret_val):
                         ingestion_failed = True
                         self.debug_print("Could not delete a fully ingested SQS message; it will be retried.")
+                    else:
+                        message_progress.pop(message_id, None)
         elif not poll_now:
             if last_successful_updated_at:
                 self._state["last_ingested_date"] = last_successful_updated_at
