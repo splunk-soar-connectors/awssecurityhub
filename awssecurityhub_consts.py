@@ -92,6 +92,7 @@ AWSSECURITYHUB_MAX_PAGINATION_ITEMS = 100000
 AWSSECURITYHUB_MAX_PAGINATION_PAGES = 1000
 AWSSECURITYHUB_PAGINATION_LIMIT_EXCEEDED = "Pagination exceeded the connector safety limit"
 AWSSECURITYHUB_PAGINATION_TOKEN_REPEATED = "Pagination token did not advance"
+AWSSECURITYHUB_PAGINATION_PAGE_OVERSIZED = "Provider returned more findings than the requested page allowance"
 
 # constants relating to 'initialize'
 AWSSECURITYHUB_STATE_FILE_CORRUPT_ERROR = (

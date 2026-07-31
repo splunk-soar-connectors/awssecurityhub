@@ -611,6 +611,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
     def _paginator(self, method_name, filters, limit, action_result):
         list_items = list()
+        requested_limit = int(limit) if limit else AWSSECURITYHUB_MAX_PAGINATION_ITEMS
         next_token = None
         seen_tokens = set()
         page_count = 0
@@ -621,23 +622,29 @@ class AwsSecurityHubConnector(BaseConnector):
                 action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_PAGINATION_LIMIT_EXCEEDED)
                 return None
 
+            remaining = min(requested_limit, AWSSECURITYHUB_MAX_PAGINATION_ITEMS) - len(list_items)
+            if remaining <= 0:
+                return list_items
+            page_allowance = min(AWSSECURITYHUB_MAX_PER_PAGE_LIMIT, remaining)
+
             if next_token:
                 ret_val, response = self._make_boto_call(
-                    action_result, method_name, Filters=filters, NextToken=next_token, MaxResults=AWSSECURITYHUB_MAX_PER_PAGE_LIMIT
+                    action_result, method_name, Filters=filters, NextToken=next_token, MaxResults=page_allowance
                 )
             else:
-                ret_val, response = self._make_boto_call(
-                    action_result, method_name, Filters=filters, MaxResults=AWSSECURITYHUB_MAX_PER_PAGE_LIMIT
-                )
+                ret_val, response = self._make_boto_call(action_result, method_name, Filters=filters, MaxResults=page_allowance)
 
             if phantom.is_fail(ret_val):
                 return None
 
-            if response.get("Findings"):
-                list_items.extend(response.get("Findings"))
+            page_findings = response.get("Findings", [])
+            if not isinstance(page_findings, list) or len(page_findings) > page_allowance:
+                action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_PAGINATION_PAGE_OVERSIZED)
+                return None
+            list_items.extend(page_findings)
 
-            if limit and len(list_items) >= int(limit):
-                return list_items[: int(limit)]
+            if limit and len(list_items) >= requested_limit:
+                return list_items[:requested_limit]
 
             next_token = response.get("NextToken")
             if not next_token:
