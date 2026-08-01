@@ -720,8 +720,8 @@ class AwsSecurityHubConnector(BaseConnector):
 
         filters = {"Id": [{"Comparison": AWSSECURITYHUB_EQUALS_CONSTS, "Value": findings_id}]}
 
-        # Validation of the correctness of the findings_id
-        list_findings = self._paginator("get_findings", filters, None, action_result)
+        # An exact finding ID lookup never needs more than one provider page.
+        list_findings = self._paginator("get_findings", filters, AWSSECURITYHUB_MAX_PER_PAGE_LIMIT, action_result)
 
         if list_findings is None:
             return (False, False, None)
