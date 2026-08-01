@@ -318,6 +318,10 @@ class AwsSecurityHubConnector(BaseConnector):
         message_records = []
         poll_state = {"invalid_message": False, "deferred": False}
         message_progress = self._state.setdefault("sqs_message_progress", {})
+        deferred_message_ids = self._state.setdefault("sqs_deferred_message_ids", [])
+        if not isinstance(deferred_message_ids, list):
+            deferred_message_ids = []
+            self._state["sqs_deferred_message_ids"] = deferred_message_ids
         while len(findings) < max_containers:
             ret_val, resp_json = self._make_boto_call(
                 action_result, "receive_message", QueueUrl=url, MaxNumberOfMessages=AWSSECURITYHUB_SQS_MESSAGE_LIMIT
@@ -329,7 +333,12 @@ class AwsSecurityHubConnector(BaseConnector):
             if "Messages" not in resp_json:
                 return findings, message_records, poll_state
 
-            for message_index, message in enumerate(resp_json["Messages"]):
+            priority_order = {message_id: index for index, message_id in enumerate(deferred_message_ids)}
+            received_messages = sorted(
+                resp_json["Messages"],
+                key=lambda message: priority_order.get(message.get("MessageId"), len(priority_order)),
+            )
+            for message_index, message in enumerate(received_messages):
                 message_body = message.get("Body", "{}")
                 try:
                     message_dict = json.loads(message_body)
@@ -349,6 +358,8 @@ class AwsSecurityHubConnector(BaseConnector):
                     poll_state["invalid_message"] = True
                     self.save_progress("An SQS message lacked a stable message identifier and will remain queued for retry")
                     continue
+                if message_id in deferred_message_ids:
+                    deferred_message_ids.remove(message_id)
 
                 body_sha256 = hashlib.sha256(message_body.encode()).hexdigest()
                 saved_progress = message_progress.get(message_id, {})
@@ -385,9 +396,15 @@ class AwsSecurityHubConnector(BaseConnector):
                 )
 
                 if len(findings) >= max_containers:
-                    if message_index + 1 < len(resp_json["Messages"]):
+                    remaining_messages = received_messages[message_index + 1 :]
+                    if remaining_messages:
                         poll_state["deferred"] = True
                         self.save_progress("Additional SQS messages were deferred by the poll cap and remain queued for retry")
+                        for deferred_message in remaining_messages:
+                            deferred_message_id = deferred_message.get("MessageId")
+                            if deferred_message_id and deferred_message_id not in deferred_message_ids:
+                                deferred_message_ids.append(deferred_message_id)
+                        del deferred_message_ids[:-100]
                     break
 
             self.send_progress(f"Received {min(len(findings), max_containers)} messages")
@@ -570,6 +587,8 @@ class AwsSecurityHubConnector(BaseConnector):
                         self.debug_print("Could not delete a fully ingested SQS message; it will be retried.")
                     else:
                         message_progress.pop(message_id, None)
+                        if message_id in self._state["sqs_deferred_message_ids"]:
+                            self._state["sqs_deferred_message_ids"].remove(message_id)
         elif not poll_now:
             if last_successful_updated_at:
                 self._state["last_ingested_date"] = last_successful_updated_at

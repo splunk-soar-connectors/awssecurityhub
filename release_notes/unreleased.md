@@ -7,4 +7,5 @@
 * Persist per-message SQS progress so capped polls resume at the unprocessed finding.
 * Track SQS ingestion by exact message occurrence and delete only fully ingested messages.
 * Rotate capped SQS retries past persistent failures and report deferred or invalid messages.
+* Prioritize messages deferred by an earlier poll so persistent failures cannot starve later messages.
 * Continue direct polling after individual ingestion failures without checkpointing past the earliest failure.
