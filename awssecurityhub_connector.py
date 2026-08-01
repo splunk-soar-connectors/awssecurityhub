@@ -15,6 +15,7 @@
 #
 #
 import ast
+import hashlib
 import ipaddress
 import json
 from datetime import datetime, timedelta, timezone
@@ -315,6 +316,12 @@ class AwsSecurityHubConnector(BaseConnector):
 
         findings = []
         message_records = []
+        poll_state = {"invalid_message": False, "deferred": False}
+        message_progress = self._state.setdefault("sqs_message_progress", {})
+        deferred_message_ids = self._state.setdefault("sqs_deferred_message_ids", [])
+        if not isinstance(deferred_message_ids, list):
+            deferred_message_ids = []
+            self._state["sqs_deferred_message_ids"] = deferred_message_ids
         while len(findings) < max_containers:
             ret_val, resp_json = self._make_boto_call(
                 action_result, "receive_message", QueueUrl=url, MaxNumberOfMessages=AWSSECURITYHUB_SQS_MESSAGE_LIMIT
@@ -324,57 +331,141 @@ class AwsSecurityHubConnector(BaseConnector):
                 return None
 
             if "Messages" not in resp_json:
-                return findings, message_records
+                return findings, message_records, poll_state
 
-            for message in resp_json["Messages"]:
+            priority_order = {message_id: index for index, message_id in enumerate(deferred_message_ids)}
+            received_messages = sorted(
+                resp_json["Messages"],
+                key=lambda message: priority_order.get(message.get("MessageId"), len(priority_order)),
+            )
+            for message_index, message in enumerate(received_messages):
+                message_body = message.get("Body", "{}")
                 try:
-                    message_dict = json.loads(message.get("Body", "{}"))
+                    message_dict = json.loads(message_body)
                 except Exception:
-                    self.debug_print(
-                        "Skipping the following sqs message because of failure to extract finding object: {}".format(message.get("Body", "{}"))
-                    )
+                    poll_state["invalid_message"] = True
+                    self.save_progress("An SQS message could not be parsed and will remain queued for retry")
                     continue
 
-                if message_dict and message_dict.get("detail", {}).get("findings", []):
-                    message_findings = message_dict["detail"]["findings"]
-                else:
-                    self.debug_print(f"Skipping the following sqs message because of failure to extract finding object: {message_dict}")
+                message_findings = message_dict.get("detail", {}).get("findings", []) if isinstance(message_dict, dict) else []
+                if not isinstance(message_findings, list) or not message_findings:
+                    poll_state["invalid_message"] = True
+                    self.save_progress("An SQS message did not contain findings and will remain queued for retry")
                     continue
 
+                message_id = message.get("MessageId")
+                if not message_id:
+                    poll_state["invalid_message"] = True
+                    self.save_progress("An SQS message lacked a stable message identifier and will remain queued for retry")
+                    continue
+                if message_id in deferred_message_ids:
+                    deferred_message_ids.remove(message_id)
+
+                body_sha256 = hashlib.sha256(message_body.encode()).hexdigest()
+                saved_progress = message_progress.get(message_id, {})
+                if not isinstance(saved_progress, dict) or saved_progress.get("body_sha256") != body_sha256:
+                    # Legacy ID-only progress and reused message IDs cannot safely identify
+                    # individual finding occurrences. Reprocess them conservatively.
+                    saved_progress = {}
+
+                completed_occurrences = set(saved_progress.get("completed_occurrences", []))
+                occurrence_count = len(message_findings)
+                next_occurrence = saved_progress.get("next_occurrence", 0)
+                if not isinstance(next_occurrence, int) or not 0 <= next_occurrence < occurrence_count:
+                    next_occurrence = 0
+                occurrence_order = [*range(next_occurrence, occurrence_count), *range(next_occurrence)]
+                pending_occurrences = [
+                    (occurrence_index, message_findings[occurrence_index])
+                    for occurrence_index in occurrence_order
+                    if occurrence_index not in completed_occurrences
+                ]
                 remaining = max_containers - len(findings)
-                selected_findings = message_findings[:remaining]
-                findings.extend(selected_findings)
+                selected_occurrences = pending_occurrences[:remaining]
+                if len(selected_occurrences) < len(pending_occurrences):
+                    poll_state["deferred"] = True
+                    self.save_progress("SQS findings were deferred by the poll cap and remain queued for retry")
+                findings.extend(finding for _, finding in selected_occurrences)
                 message_records.append(
                     {
+                        "message_id": message_id,
                         "receipt_handle": message["ReceiptHandle"],
-                        "finding_ids": [finding.get("Id") for finding in selected_findings],
-                        "complete": len(selected_findings) == len(message_findings),
+                        "body_sha256": body_sha256,
+                        "occurrence_count": occurrence_count,
+                        "selected_occurrences": selected_occurrences,
                     }
                 )
 
                 if len(findings) >= max_containers:
+                    remaining_messages = received_messages[message_index + 1 :]
+                    if remaining_messages:
+                        poll_state["deferred"] = True
+                        self.save_progress("Additional SQS messages were deferred by the poll cap and remain queued for retry")
+                        for deferred_message in remaining_messages:
+                            deferred_message_id = deferred_message.get("MessageId")
+                            if deferred_message_id and deferred_message_id not in deferred_message_ids:
+                                deferred_message_ids.append(deferred_message_id)
+                        del deferred_message_ids[:-100]
                     break
 
             self.send_progress(f"Received {min(len(findings), max_containers)} messages")
 
-        return findings, message_records
+        return findings, message_records, poll_state
 
-    def _poll_from_security_hub(self, action_result, max_containers, param):
+    def _get_scheduled_poll_start(self, now):
+        fallback_start = now - timedelta(days=self._scheduled_poll_days)
+        if self._state.get("first_run", True):
+            initial_start = self._state.get("initial_poll_start")
+            if initial_start:
+                return initial_start
+            initial_start = fallback_start.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            self._state["initial_poll_start"] = initial_start
+            return initial_start
+
+        if self._state.get("checkpoint_version") != 2:
+            legacy_checkpoint = self._state.get("last_ingested_date")
+            try:
+                parsed_checkpoint = datetime.fromisoformat(legacy_checkpoint.replace("Z", "+00:00"))
+                if parsed_checkpoint.tzinfo is None:
+                    raise ValueError("checkpoint lacks a timezone")
+                if parsed_checkpoint > now:
+                    raise ValueError("checkpoint is in the future")
+                migrated_datetime = min(parsed_checkpoint, fallback_start)
+            except (AttributeError, TypeError, ValueError):
+                migrated_datetime = fallback_start
+            migrated_start = migrated_datetime.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            self._state["last_ingested_date"] = migrated_start
+            self._state["checkpoint_version"] = 2
+            return migrated_start
+
+        last_ingested_date = self._state.get("last_ingested_date")
+        if not last_ingested_date:
+            return fallback_start.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+        try:
+            parsed_checkpoint = datetime.fromisoformat(last_ingested_date.replace("Z", "+00:00"))
+            if parsed_checkpoint.tzinfo is None:
+                raise ValueError("checkpoint lacks a timezone")
+            if parsed_checkpoint > now:
+                raise ValueError("checkpoint is in the future")
+        except (AttributeError, TypeError, ValueError):
+            migrated_start = fallback_start.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            self._state["last_ingested_date"] = migrated_start
+            return migrated_start
+
+        return last_ingested_date
+
+    def _poll_from_security_hub(self, action_result, max_containers, param, poll_now):
         if phantom.is_fail(self._create_client(action_result, "securityhub", param)):
             return None
 
-        end_date = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        now = datetime.now(timezone.utc)
+        end_date = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         self._poll_window_end = end_date
-        if self.is_poll_now():
+        if poll_now:
             days = self._poll_now_days
             filters = {"UpdatedAt": [{"DateRange": {"Value": days, "Unit": "DAYS"}}]}
-        elif self._state.get("first_run", True):
-            days = self._scheduled_poll_days
-            filters = {"UpdatedAt": [{"DateRange": {"Value": days, "Unit": "DAYS"}}]}
         else:
-            start_date = self._state.get("last_ingested_date")
-            if not start_date:
-                start_date = (datetime.now(timezone.utc) - timedelta(days=self._scheduled_poll_days)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            start_date = self._get_scheduled_poll_start(now)
             filters = {"UpdatedAt": [{"Start": start_date, "End": end_date}]}
 
         findings = self._paginator("get_findings", filters, max_containers, action_result)
@@ -396,17 +487,19 @@ class AwsSecurityHubConnector(BaseConnector):
 
         config = self.get_config()
         container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
+        poll_now = self.is_poll_now()
 
         sqs_message_records = []
+        sqs_poll_state = {"invalid_message": False, "deferred": False}
         polling_sqs = bool(config.get("sqs_url"))
         if polling_sqs:
             poll_result = self._poll_from_sqs(action_result, config["sqs_url"], container_count, param)
             if poll_result is None:
                 findings = None
             else:
-                findings, sqs_message_records = poll_result
+                findings, sqs_message_records, sqs_poll_state = poll_result
         else:
-            findings = self._poll_from_security_hub(action_result, container_count, param)
+            findings = self._poll_from_security_hub(action_result, container_count, param, poll_now)
 
         if findings:
             self.save_progress("Ingesting data")
@@ -417,23 +510,25 @@ class AwsSecurityHubConnector(BaseConnector):
             self.save_progress("No findings found")
 
         if not polling_sqs:
-            findings.sort(key=lambda finding: finding.get("UpdatedAt", ""))
+            findings.sort(key=lambda finding: finding.get("UpdatedAt", "") if isinstance(finding, dict) else "")
 
-        successful_finding_ids = set()
+        successful_finding_objects = set()
         last_successful_updated_at = None
-        ingestion_failed = False
+        ingestion_failed = sqs_poll_state["invalid_message"]
+        direct_checkpoint_blocked = False
 
         for finding in findings:
+            finding_id = finding.get("Id", "unknown") if isinstance(finding, dict) else "unknown"
             try:
                 container_id = self._create_container(finding)
             except Exception as exc:
-                self.debug_print(f"Error while creating container for finding {finding.get('Id', 'unknown')}: {exc}")
+                self.debug_print(f"Error while creating container for finding {finding_id}: {exc}")
                 container_id = None
 
             if not container_id:
+                self.save_progress(f"Could not durably ingest finding {finding_id}; it will remain eligible for retry")
                 ingestion_failed = True
-                if not polling_sqs:
-                    break
+                direct_checkpoint_blocked = direct_checkpoint_blocked or not polling_sqs
                 continue
 
             # Create artifacts for specific finding
@@ -446,20 +541,41 @@ class AwsSecurityHubConnector(BaseConnector):
 
             if phantom.is_fail(artifacts_creation_status):
                 self.debug_print(f"Error while creating artifacts for container with ID {container_id}. {artifacts_creation_message}")
+                self.save_progress(f"Could not durably ingest finding {finding_id}; it will remain eligible for retry")
                 ingestion_failed = True
-                if not polling_sqs:
-                    break
+                direct_checkpoint_blocked = direct_checkpoint_blocked or not polling_sqs
                 continue
 
-            finding_id = finding.get("Id")
-            if finding_id:
-                successful_finding_ids.add(finding_id)
-            last_successful_updated_at = finding.get("UpdatedAt") or last_successful_updated_at
+            successful_finding_objects.add(id(finding))
+            if not direct_checkpoint_blocked:
+                last_successful_updated_at = finding.get("UpdatedAt") or last_successful_updated_at
 
         if polling_sqs:
+            message_progress = self._state.setdefault("sqs_message_progress", {})
             for message_record in sqs_message_records:
-                finding_ids = set(message_record["finding_ids"])
-                if message_record["complete"] and finding_ids and finding_ids.issubset(successful_finding_ids):
+                message_id = message_record["message_id"]
+                body_sha256 = message_record["body_sha256"]
+                saved_progress = message_progress.get(message_id, {})
+                if not isinstance(saved_progress, dict) or saved_progress.get("body_sha256") != body_sha256:
+                    saved_progress = {}
+
+                completed_occurrences = set(saved_progress.get("completed_occurrences", []))
+                completed_occurrences.update(
+                    occurrence_index
+                    for occurrence_index, finding in message_record["selected_occurrences"]
+                    if id(finding) in successful_finding_objects
+                )
+                selected_occurrences = message_record["selected_occurrences"]
+                next_occurrence = (selected_occurrences[-1][0] + 1) % message_record["occurrence_count"] if selected_occurrences else 0
+                if completed_occurrences or selected_occurrences:
+                    message_progress[message_id] = {
+                        "body_sha256": body_sha256,
+                        "completed_occurrences": sorted(completed_occurrences),
+                        "next_occurrence": next_occurrence,
+                    }
+
+                all_occurrences = set(range(message_record["occurrence_count"]))
+                if all_occurrences and all_occurrences.issubset(completed_occurrences):
                     ret_val, _ = self._make_boto_call(
                         action_result,
                         "delete_message",
@@ -469,16 +585,27 @@ class AwsSecurityHubConnector(BaseConnector):
                     if phantom.is_fail(ret_val):
                         ingestion_failed = True
                         self.debug_print("Could not delete a fully ingested SQS message; it will be retried.")
-        elif not self.is_poll_now():
+                    else:
+                        message_progress.pop(message_id, None)
+                        if message_id in self._state["sqs_deferred_message_ids"]:
+                            self._state["sqs_deferred_message_ids"].remove(message_id)
+        elif not poll_now:
             if last_successful_updated_at:
                 self._state["last_ingested_date"] = last_successful_updated_at
                 self._state["first_run"] = False
+                self._state["checkpoint_version"] = 2
+                self._state.pop("initial_poll_start", None)
             elif not findings and not ingestion_failed:
                 self._state["last_ingested_date"] = self._poll_window_end
                 self._state["first_run"] = False
+                self._state["checkpoint_version"] = 2
+                self._state.pop("initial_poll_start", None)
 
         if ingestion_failed:
             return action_result.set_status(phantom.APP_ERROR, "One or more findings were not durably ingested and will be retried")
+
+        if sqs_poll_state["deferred"]:
+            return action_result.set_status(phantom.APP_SUCCESS, "Some SQS findings were deferred by the poll cap and remain queued for retry")
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -577,6 +704,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
     def _paginator(self, method_name, filters, limit, action_result):
         list_items = list()
+        requested_limit = int(limit) if limit else AWSSECURITYHUB_MAX_PAGINATION_ITEMS
         next_token = None
         seen_tokens = set()
         page_count = 0
@@ -587,23 +715,29 @@ class AwsSecurityHubConnector(BaseConnector):
                 action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_PAGINATION_LIMIT_EXCEEDED)
                 return None
 
+            remaining = min(requested_limit, AWSSECURITYHUB_MAX_PAGINATION_ITEMS) - len(list_items)
+            if remaining <= 0:
+                return list_items
+            page_allowance = min(AWSSECURITYHUB_MAX_PER_PAGE_LIMIT, remaining)
+
             if next_token:
                 ret_val, response = self._make_boto_call(
-                    action_result, method_name, Filters=filters, NextToken=next_token, MaxResults=AWSSECURITYHUB_MAX_PER_PAGE_LIMIT
+                    action_result, method_name, Filters=filters, NextToken=next_token, MaxResults=page_allowance
                 )
             else:
-                ret_val, response = self._make_boto_call(
-                    action_result, method_name, Filters=filters, MaxResults=AWSSECURITYHUB_MAX_PER_PAGE_LIMIT
-                )
+                ret_val, response = self._make_boto_call(action_result, method_name, Filters=filters, MaxResults=page_allowance)
 
             if phantom.is_fail(ret_val):
                 return None
 
-            if response.get("Findings"):
-                list_items.extend(response.get("Findings"))
+            page_findings = response.get("Findings", [])
+            if not isinstance(page_findings, list) or len(page_findings) > page_allowance:
+                action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_PAGINATION_PAGE_OVERSIZED)
+                return None
+            list_items.extend(page_findings)
 
-            if limit and len(list_items) >= int(limit):
-                return list_items[: int(limit)]
+            if limit and len(list_items) >= requested_limit:
+                return list_items[:requested_limit]
 
             next_token = response.get("NextToken")
             if not next_token:
@@ -633,22 +767,15 @@ class AwsSecurityHubConnector(BaseConnector):
         if not (valid_findings_id and finding):
             return action_result.get_status()
 
-        filters = {"Id": [{"Value": findings_id, "Comparison": AWSSECURITYHUB_EQUALS_CONSTS}]}
-        ret_val, response = self._make_boto_call(action_result, "get_findings", Filters=filters)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        for finding in response.get("Findings", []):
-            resources = finding.get("Resources")
-            if resources:
-                for resource in resources:
-                    resource_type = resource.get("Type")
-                    if resource_type and "AwsEc2Instance" == resource_type:
-                        instance_list = resource.get("Id", "").split(":instance/i-")
-                        if instance_list and len(instance_list) == 2:
-                            resource["InstanceId"] = f"i-{instance_list[1]}"
-            action_result.add_data(finding)
+        resources = finding.get("Resources")
+        if resources:
+            for resource in resources:
+                resource_type = resource.get("Type")
+                if resource_type and "AwsEc2Instance" == resource_type:
+                    instance_list = resource.get("Id", "").split(":instance/i-")
+                    if instance_list and len(instance_list) == 2:
+                        resource["InstanceId"] = f"i-{instance_list[1]}"
+        action_result.add_data(finding)
 
         summary = action_result.update_summary({})
         summary["total_findings"] = action_result.get_data_size()
@@ -660,8 +787,8 @@ class AwsSecurityHubConnector(BaseConnector):
 
         filters = {"Id": [{"Comparison": AWSSECURITYHUB_EQUALS_CONSTS, "Value": findings_id}]}
 
-        # Validation of the correctness of the findings_id
-        list_findings = self._paginator("get_findings", filters, None, action_result)
+        # Bound exact-ID validation to one provider page's maximum item count.
+        list_findings = self._paginator("get_findings", filters, AWSSECURITYHUB_MAX_PER_PAGE_LIMIT, action_result)
 
         if list_findings is None:
             return (False, False, None)
