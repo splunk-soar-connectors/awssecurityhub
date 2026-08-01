@@ -15,6 +15,7 @@
 #
 #
 import ast
+import hashlib
 import ipaddress
 import json
 from datetime import datetime, timedelta, timezone
@@ -328,12 +329,11 @@ class AwsSecurityHubConnector(BaseConnector):
                 return findings, message_records
 
             for message in resp_json["Messages"]:
+                message_body = message.get("Body", "{}")
                 try:
-                    message_dict = json.loads(message.get("Body", "{}"))
+                    message_dict = json.loads(message_body)
                 except Exception:
-                    self.debug_print(
-                        "Skipping the following sqs message because of failure to extract finding object: {}".format(message.get("Body", "{}"))
-                    )
+                    self.debug_print(f"Skipping the following sqs message because of failure to extract finding object: {message_body}")
                     continue
 
                 if message_dict and message_dict.get("detail", {}).get("findings", []):
@@ -348,17 +348,29 @@ class AwsSecurityHubConnector(BaseConnector):
                     self.debug_print("Skipping an SQS message that lacks stable message or finding identifiers")
                     continue
 
-                completed_finding_ids = set(message_progress.get(message_id, []))
-                pending_findings = [finding for finding in message_findings if finding["Id"] not in completed_finding_ids]
+                body_sha256 = hashlib.sha256(message_body.encode()).hexdigest()
+                saved_progress = message_progress.get(message_id, {})
+                if not isinstance(saved_progress, dict) or saved_progress.get("body_sha256") != body_sha256:
+                    # Legacy ID-only progress and reused message IDs cannot safely identify
+                    # individual finding occurrences. Reprocess them conservatively.
+                    saved_progress = {}
+
+                completed_occurrences = set(saved_progress.get("completed_occurrences", []))
+                pending_occurrences = [
+                    (occurrence_index, finding)
+                    for occurrence_index, finding in enumerate(message_findings)
+                    if occurrence_index not in completed_occurrences
+                ]
                 remaining = max_containers - len(findings)
-                selected_findings = pending_findings[:remaining]
-                findings.extend(selected_findings)
+                selected_occurrences = pending_occurrences[:remaining]
+                findings.extend(finding for _, finding in selected_occurrences)
                 message_records.append(
                     {
                         "message_id": message_id,
                         "receipt_handle": message["ReceiptHandle"],
-                        "all_finding_ids": all_finding_ids,
-                        "selected_finding_ids": [finding["Id"] for finding in selected_findings],
+                        "body_sha256": body_sha256,
+                        "occurrence_count": len(message_findings),
+                        "selected_occurrences": selected_occurrences,
                     }
                 )
 
@@ -459,7 +471,7 @@ class AwsSecurityHubConnector(BaseConnector):
         if not polling_sqs:
             findings.sort(key=lambda finding: finding.get("UpdatedAt", ""))
 
-        successful_finding_ids = set()
+        successful_finding_objects = set()
         last_successful_updated_at = None
         ingestion_failed = False
 
@@ -491,22 +503,32 @@ class AwsSecurityHubConnector(BaseConnector):
                     break
                 continue
 
-            finding_id = finding.get("Id")
-            if finding_id:
-                successful_finding_ids.add(finding_id)
+            successful_finding_objects.add(id(finding))
             last_successful_updated_at = finding.get("UpdatedAt") or last_successful_updated_at
 
         if polling_sqs:
             message_progress = self._state.setdefault("sqs_message_progress", {})
             for message_record in sqs_message_records:
                 message_id = message_record["message_id"]
-                completed_finding_ids = set(message_progress.get(message_id, []))
-                completed_finding_ids.update(set(message_record["selected_finding_ids"]) & successful_finding_ids)
-                if completed_finding_ids:
-                    message_progress[message_id] = sorted(completed_finding_ids)
+                body_sha256 = message_record["body_sha256"]
+                saved_progress = message_progress.get(message_id, {})
+                if not isinstance(saved_progress, dict) or saved_progress.get("body_sha256") != body_sha256:
+                    saved_progress = {}
 
-                all_finding_ids = set(message_record["all_finding_ids"])
-                if all_finding_ids and all_finding_ids.issubset(completed_finding_ids):
+                completed_occurrences = set(saved_progress.get("completed_occurrences", []))
+                completed_occurrences.update(
+                    occurrence_index
+                    for occurrence_index, finding in message_record["selected_occurrences"]
+                    if id(finding) in successful_finding_objects
+                )
+                if completed_occurrences:
+                    message_progress[message_id] = {
+                        "body_sha256": body_sha256,
+                        "completed_occurrences": sorted(completed_occurrences),
+                    }
+
+                all_occurrences = set(range(message_record["occurrence_count"]))
+                if all_occurrences and all_occurrences.issubset(completed_occurrences):
                     ret_val, _ = self._make_boto_call(
                         action_result,
                         "delete_message",
