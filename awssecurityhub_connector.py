@@ -52,6 +52,10 @@ class AwsSecurityHubConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+    @staticmethod
+    def _sanitize_action_parameters(param):
+        return {key: value for key, value in param.items() if key != "credentials"}
+
     def _handle_get_ec2_role(self):
         session = Session(region_name=self._region)
         credentials = session.get_credentials()
@@ -221,7 +225,7 @@ class AwsSecurityHubConnector(BaseConnector):
         return phantom.APP_SUCCESS, resp_json
 
     def _handle_test_connectivity(self, param):
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(self._sanitize_action_parameters(param)))
 
         self.save_progress("Connecting to endpoint")
 
@@ -483,7 +487,7 @@ class AwsSecurityHubConnector(BaseConnector):
         """
 
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(self._sanitize_action_parameters(param)))
 
         config = self.get_config()
         container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
@@ -610,7 +614,7 @@ class AwsSecurityHubConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_findings(self, param):
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(self._sanitize_action_parameters(param)))
 
         if phantom.is_fail(self._create_client(action_result, "securityhub", param)):
             return action_result.get_status()
@@ -755,7 +759,7 @@ class AwsSecurityHubConnector(BaseConnector):
         return list_items
 
     def _handle_get_related_findings(self, param):
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(self._sanitize_action_parameters(param)))
 
         if phantom.is_fail(self._create_client(action_result, "securityhub", param)):
             return action_result.get_status()
@@ -809,7 +813,7 @@ class AwsSecurityHubConnector(BaseConnector):
         return (True, True, valid_finding)
 
     def _handle_archive_findings(self, param):
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(self._sanitize_action_parameters(param)))
 
         if phantom.is_fail(self._create_client(action_result, "securityhub", param)):
             return action_result.get_status()
@@ -852,7 +856,7 @@ class AwsSecurityHubConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_unarchive_findings(self, param):
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(self._sanitize_action_parameters(param)))
 
         if phantom.is_fail(self._create_client(action_result, "securityhub", param)):
             return action_result.get_status()
@@ -895,7 +899,7 @@ class AwsSecurityHubConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_add_note(self, param):
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(self._sanitize_action_parameters(param)))
 
         if phantom.is_fail(self._create_client(action_result, "securityhub", param)):
             return action_result.get_status()

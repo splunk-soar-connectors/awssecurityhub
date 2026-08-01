@@ -179,7 +179,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **end_time** | optional | End of the time range, in epoch time (milliseconds) | numeric | |
 **container_count** | optional | Maximum number of container records to query for | numeric | |
 **artifact_count** | optional | Maximum number of artifact records to query for | numeric | |
-**credentials** | optional | Assumed role credentials | string | `aws credentials` |
+**credentials** | optional | Assumed role credentials | password | `aws credentials` |
 
 #### Action Output
 
@@ -205,14 +205,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **resource_region** | optional | The canonical AWS external region name where this resource is located | string | `aws security hub resource region` |
 **limit** | optional | Maximum number of findings to be fetched | numeric | |
 **is_archived** | optional | Flag to fetch the archived findings | boolean | |
-**credentials** | optional | Assumed role credentials | string | `aws credentials` |
+**credentials** | optional | Assumed role credentials | password | `aws credentials` |
 
 #### Action Output
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
-action_result.parameter.credentials | string | `aws credentials` | {'AccessKeyId': 'REDACTED', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'REDACTED', 'SessionToken': 'REDACTED'} |
 action_result.parameter.is_archived | boolean | | False True |
 action_result.parameter.limit | numeric | | 150 |
 action_result.parameter.network_source_ipv4 | string | `aws security hub network source ip` | 172.40.20.1 |
@@ -607,14 +606,13 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **findings_id** | required | Identifier of security finding | string | `aws security hub findings id` `aws arn` |
-**credentials** | optional | Assumed role credentials | string | `aws credentials` |
+**credentials** | optional | Assumed role credentials | password | `aws credentials` |
 
 #### Action Output
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
-action_result.parameter.credentials | string | `aws credentials` | {'AccessKeyId': 'REDACTED', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'REDACTED', 'SessionToken': 'REDACTED'} |
 action_result.parameter.findings_id | string | `aws security hub findings id` `aws arn` | arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef/finding/1234abcd12abab1ab12123456abcdef |
 action_result.data.\*.AwsAccountId | string | | 01234567890 |
 action_result.data.\*.CompanyName | string | | AWS |
@@ -767,14 +765,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **findings_id** | required | Identifier of security finding | string | `aws security hub findings id` `aws arn` |
 **note** | optional | The text of a note | string | |
 **overwrite** | optional | Check this box to overwrite the existing notes, otherwise, notes will be appended to existing notes | boolean | |
-**credentials** | optional | Assumed role credentials | string | `aws credentials` |
+**credentials** | optional | Assumed role credentials | password | `aws credentials` |
 
 #### Action Output
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
-action_result.parameter.credentials | string | `aws credentials` | {'AccessKeyId': 'REDACTED', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'REDACTED', 'SessionToken': 'REDACTED'} |
 action_result.parameter.findings_id | string | `aws security hub findings id` `aws arn` | arn:aws:guardduty:us-east-1123456789012detector/123456abcdef1234abcdef123456abcdef1234abcdef/finding/123456abcdef1234abcdef |
 action_result.parameter.note | string | | note for archive findings |
 action_result.parameter.overwrite | boolean | | True False |
@@ -813,14 +810,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **findings_id** | required | Identifier of security finding | string | `aws security hub findings id` `aws arn` |
 **note** | optional | The text of a note | string | |
 **overwrite** | optional | Check this box to overwrite the existing notes, otherwise, notes will be appended to existing notes | boolean | |
-**credentials** | optional | Assumed role credentials | string | `aws credentials` |
+**credentials** | optional | Assumed role credentials | password | `aws credentials` |
 
 #### Action Output
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
-action_result.parameter.credentials | string | `aws credentials` | {'AccessKeyId': 'REDACTED', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'REDACTED', 'SessionToken': 'REDACTED'} |
 action_result.parameter.findings_id | string | `aws security hub findings id` `aws arn` | arn:aws:guardduty:us-east-1:123456789012:detector/123456abcdef1234abcdef123456abcdef1234abcdef/finding/123456abcdef1234abcdef123456abcdef1234abcdef |
 action_result.parameter.note | string | | Unarchive |
 action_result.parameter.overwrite | boolean | | True False |
@@ -859,14 +855,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **findings_id** | required | Identifier of security finding | string | `aws security hub findings id` `aws arn` |
 **note** | required | The text of a note | string | |
 **overwrite** | optional | Check this box to overwrite the existing notes, otherwise, notes will be appended to existing notes | boolean | |
-**credentials** | optional | Assumed role credentials | string | `aws credentials` |
+**credentials** | optional | Assumed role credentials | password | `aws credentials` |
 
 #### Action Output
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
-action_result.parameter.credentials | string | `aws credentials` | {'AccessKeyId': 'REDACTED', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'REDACTED', 'SessionToken': 'REDACTED'} |
 action_result.parameter.findings_id | string | `aws security hub findings id` `aws arn` | arn:aws:guardduty:us-east-1:123456789012:detector/123456789abcdefghi1234ab/finding/123456789abcdefghi1234ab |
 action_result.parameter.note | string | | note for findings |
 action_result.parameter.overwrite | boolean | | True False |
