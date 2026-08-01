@@ -767,22 +767,15 @@ class AwsSecurityHubConnector(BaseConnector):
         if not (valid_findings_id and finding):
             return action_result.get_status()
 
-        filters = {"Id": [{"Value": findings_id, "Comparison": AWSSECURITYHUB_EQUALS_CONSTS}]}
-        ret_val, response = self._make_boto_call(action_result, "get_findings", Filters=filters)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        for finding in response.get("Findings", []):
-            resources = finding.get("Resources")
-            if resources:
-                for resource in resources:
-                    resource_type = resource.get("Type")
-                    if resource_type and "AwsEc2Instance" == resource_type:
-                        instance_list = resource.get("Id", "").split(":instance/i-")
-                        if instance_list and len(instance_list) == 2:
-                            resource["InstanceId"] = f"i-{instance_list[1]}"
-            action_result.add_data(finding)
+        resources = finding.get("Resources")
+        if resources:
+            for resource in resources:
+                resource_type = resource.get("Type")
+                if resource_type and "AwsEc2Instance" == resource_type:
+                    instance_list = resource.get("Id", "").split(":instance/i-")
+                    if instance_list and len(instance_list) == 2:
+                        resource["InstanceId"] = f"i-{instance_list[1]}"
+        action_result.add_data(finding)
 
         summary = action_result.update_summary({})
         summary["total_findings"] = action_result.get_data_size()
