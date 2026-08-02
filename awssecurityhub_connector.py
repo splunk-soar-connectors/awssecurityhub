@@ -495,9 +495,10 @@ class AwsSecurityHubConnector(BaseConnector):
 
         sqs_message_records = []
         sqs_poll_state = {"invalid_message": False, "deferred": False}
-        polling_sqs = bool(config.get("sqs_url"))
+        sqs_url = config.get("sqs_url")
+        polling_sqs = bool(sqs_url)
         if polling_sqs:
-            poll_result = self._poll_from_sqs(action_result, config["sqs_url"], container_count, param)
+            poll_result = self._poll_from_sqs(action_result, sqs_url, container_count, param)
             if poll_result is None:
                 findings = None
             else:
@@ -583,7 +584,7 @@ class AwsSecurityHubConnector(BaseConnector):
                     ret_val, _ = self._make_boto_call(
                         action_result,
                         "delete_message",
-                        QueueUrl=config["sqs_url"],
+                        QueueUrl=sqs_url,
                         ReceiptHandle=message_record["receipt_handle"],
                     )
                     if phantom.is_fail(ret_val):
