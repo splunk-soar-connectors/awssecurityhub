@@ -593,7 +593,6 @@ action_result.summary.total_groups | numeric | | 2 |
 action_result.message | string | | Total findings: 2 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
-action_result.parameter.credentials | password | `aws credentials` | |
 
 ## action: 'get related findings'
 
@@ -751,7 +750,6 @@ action_result.summary.total_groups | numeric | | 1 |
 action_result.message | string | | Total findings: 1 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
-action_result.parameter.credentials | password | `aws credentials` | |
 
 ## action: 'archive findings'
 
@@ -797,7 +795,6 @@ action_result.summary.archived_status | string | | Successful Failed |
 action_result.message | string | | Archive note: Added successfully, Archived status: Successful |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
-action_result.parameter.credentials | password | `aws credentials` | |
 
 ## action: 'unarchive findings'
 
@@ -843,7 +840,6 @@ action_result.summary.unarchived_status | string | | Successful Failed |
 action_result.message | string | | Unarchive note: Added successfully, Unarchived status: Successful |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
-action_result.parameter.credentials | password | `aws credentials` | |
 
 ## action: 'add note'
 
@@ -888,7 +884,6 @@ action_result.summary.add_note | string | | Success |
 action_result.message | string | | Note added successfully to the provided findings ID |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
-action_result.parameter.credentials | password | `aws credentials` | |
 
 ______________________________________________________________________
 
